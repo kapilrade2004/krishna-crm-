@@ -22,6 +22,9 @@ import {
   Columns,
   List,
   LayoutGrid,
+  Layers,
+  Pencil,
+  Trash2,
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/auth';
 import {
@@ -402,6 +405,14 @@ export default function CombinedWorkspaceView() {
         openStandard={openStandard}
         inProgressStandard={inProgressStandard}
         doneStandard={doneStandard}
+        totalAll={totalDaily + totalStandard}
+        completedAll={completedDaily + doneStandard}
+        inProgressAll={inProgressStandard}
+        pendingAll={Math.max(0, (totalDaily - completedDaily) + (openStandard - inProgressStandard))}
+        overdueAll={
+          dailyActivities.filter((a) => isOverdue(a.due_date || a.scheduled_date, a.status === 'completed' || a.status === 'COMPLETED')).length +
+          standardTasks.filter((t) => isOverdue(t.due_date, t.status === 'done' || t.status === 'cancelled')).length
+        }
         selectedDate={selectedDate}
         onStepDay={handleStepDay}
         onResetToday={handleResetToToday}
@@ -416,16 +427,17 @@ export default function CombinedWorkspaceView() {
         showKpis={true}
       />
 
-      {/* ── 2. LIVE SEARCH & QUICK FILTER BAR ── */}
+
+      {/* ── 2. STATIC SEARCH & QUICK FILTER BAR (ORIGINAL THEME, FIXED IN ONE PLACE) ── */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 p-3 bg-white rounded-2xl border border-slate-200/80 shadow-2xs">
         <div className="relative flex-1">
-          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
             placeholder="Search tasks by title, description, tags, or assignee..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 text-xs border border-slate-200 rounded-xl bg-slate-50/60 focus:bg-white focus:outline-none focus:ring-1 focus:ring-amber text-navy font-medium"
+            className="w-full pl-9 pr-3 py-1.5 text-xs border border-slate-200 rounded-xl bg-slate-50/60 focus:bg-white focus:outline-none focus:ring-1 focus:ring-amber text-navy font-medium transition-colors"
           />
         </div>
 
@@ -435,6 +447,7 @@ export default function CombinedWorkspaceView() {
             {(['all', 'daily', 'standard'] as const).map((sc) => (
               <button
                 key={sc}
+                type="button"
                 onClick={() => setFilters({ ...filters, scope: sc })}
                 className={`px-2.5 py-1 rounded-lg font-semibold transition-all ${
                   filters.scope === sc
@@ -449,6 +462,7 @@ export default function CombinedWorkspaceView() {
 
           {activeFilterCount > 0 && (
             <button
+              type="button"
               onClick={handleResetFilters}
               className="text-[11px] font-bold text-rose-600 hover:text-rose-700 px-2 py-1 bg-rose-50 border border-rose-200 rounded-lg cursor-pointer"
             >
@@ -458,207 +472,423 @@ export default function CombinedWorkspaceView() {
         </div>
       </div>
 
-      {/* ── 3. UNIFIED VIEW ENGINE: SPLIT COLUMNS vs UNIFIED STREAM ── */}
-      {layoutMode === 'split' ? (
-        /* ═══════════════════════════════════════════════════════════════════ */
-        /* MODE A: UNIFIED SPLIT VIEW (DUAL COLUMNS SIDE-BY-SIDE)              */
-        /* ═══════════════════════════════════════════════════════════════════ */
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
-          {/* LEFT COLUMN: STANDING DAILY DIRECTIVES */}
-          <div className="bg-[#FFFDF7] rounded-2xl border border-slate-200/80 p-4 sm:p-5 shadow-xs space-y-3.5">
-            {/* Column Header */}
-            <div className="flex items-center justify-between border-b border-slate-200/70 pb-3">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-teal-50 border border-teal-100 text-teal-700 flex items-center justify-center">
-                  <Activity size={16} />
-                </div>
-                <div>
-                  <h3 className="font-black text-navy text-sm flex items-center gap-1.5">
-                    <span>Daily SOP Directives</span>
-                    <span className="text-[10px] font-bold bg-teal-50 text-teal-800 border border-teal-200/70 px-2 py-0.5 rounded-full">
-                      {filteredDaily.length}
-                    </span>
-                  </h3>
-                  <p className="text-[10px] text-slate-400 font-medium">
-                    Shift operations &amp; recurring checklists
-                  </p>
-                </div>
+      {/* ── 3. HORIZONTAL STACKED FULL-WIDTH SECTIONS ── */}
+      <div className="space-y-6">
+        {/* ── SECTION 1: DAILY TASKS (FULL-WIDTH HORIZONTAL CARD TABLE) ── */}
+        <div className="bg-[#FFFDF7] rounded-[20px] border border-[#E7E5DE] shadow-xs overflow-hidden transition-all duration-180 hover:border-slate-300">
+          {/* Section Header */}
+          <div className="p-5 sm:p-6 border-b border-[#E7E5DE] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100/80 text-blue-600 flex items-center justify-center shrink-0">
+                <CheckSquare size={20} />
               </div>
-
-              <button
-                onClick={() => handleOpenCreateModal('daily')}
-                className="inline-flex items-center gap-1 text-xs bg-teal-600 hover:bg-teal-700 text-white font-bold px-2.5 py-1.5 rounded-xl shadow-2xs transition-colors cursor-pointer"
-              >
-                <Plus size={13} />
-                <span>+ Directive</span>
-              </button>
+              <div>
+                <h2 className="text-[20px] font-bold text-navy leading-tight flex items-center gap-2">
+                  <span>Daily Tasks</span>
+                  <span className="text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200/70 px-2.5 py-0.5 rounded-full">
+                    {filteredDaily.length}
+                  </span>
+                </h2>
+                <p className="text-[12px] text-slate-400 font-medium mt-0.5">
+                  Today&apos;s tasks and immediate actions
+                </p>
+              </div>
             </div>
 
-            {/* List / Cards */}
+            <div className="flex items-center gap-2.5 self-start sm:self-auto shrink-0">
+              <button
+                type="button"
+                onClick={() => handleOpenCreateModal('daily')}
+                className="inline-flex items-center justify-center gap-1.5 h-10 px-5 rounded-full text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition-all duration-180 hover:-translate-y-0.5 active:scale-[0.98] cursor-pointer shrink-0"
+              >
+                <Plus size={15} />
+                <span>+ Add Daily Task</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Inline Filter Bar */}
+          <div className="px-5 sm:px-6 py-3.5 bg-slate-50/50 border-b border-[#E7E5DE] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+            <div className="relative flex-1 max-w-md">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                placeholder="Search by task name, assigned to, or description..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-4 h-9 text-xs border border-[#E7E5DE] rounded-full bg-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-navy font-medium transition-all"
+              />
+            </div>
+
+            <div className="flex items-center gap-2 flex-wrap">
+              <select
+                value={filters.priority}
+                onChange={(e) => setFilters({ ...filters, priority: e.target.value })}
+                className="h-9 px-3.5 rounded-full text-xs font-semibold bg-white border border-[#E7E5DE] text-slate-700 hover:bg-slate-50 focus:outline-none cursor-pointer"
+              >
+                <option value="all">All Priorities</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="urgent">Urgent</option>
+              </select>
+
+              <select
+                value={filters.status}
+                onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+                className="h-9 px-3.5 rounded-full text-xs font-semibold bg-white border border-[#E7E5DE] text-slate-700 hover:bg-slate-50 focus:outline-none cursor-pointer"
+              >
+                <option value="all">All Statuses</option>
+                <option value="todo">Pending</option>
+                <option value="completed">Completed</option>
+              </select>
+
+              {activeFilterCount > 0 && (
+                <button
+                  type="button"
+                  onClick={handleResetFilters}
+                  className="h-9 px-3.5 rounded-full text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-200/80 hover:bg-rose-100 transition-colors cursor-pointer"
+                >
+                  Reset
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Table Container */}
+          <div className="overflow-x-auto">
             {filteredDaily.length === 0 ? (
-              <div className="py-10 text-center text-slate-400 text-xs">
-                No daily directives found for this filter or shift date.
-              </div>
-            ) : viewMode === 'line' ? (
-              <div className="space-y-1.5">
-                {filteredDaily.map((act) => (
-                  <TaskItemRow
-                    key={act.id}
-                    item={{ type: 'daily', data: act }}
-                    onSelect={handleOpenInspector}
-                    onToggleComplete={handleToggleComplete}
-                    onStatusChange={handleStatusChange}
-                    canScore={canScore}
-                  />
-                ))}
+              <div className="py-16 text-center space-y-2">
+                <div className="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mx-auto">
+                  <Activity size={22} />
+                </div>
+                <h4 className="text-sm font-bold text-navy">No daily tasks found</h4>
+                <p className="text-xs text-slate-400">Add a new daily task for today&apos;s shift to get started.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {filteredDaily.map((act) => (
-                  <TaskItemCard
-                    key={act.id}
-                    item={{ type: 'daily', data: act }}
-                    onSelect={handleOpenInspector}
-                    onToggleComplete={handleToggleComplete}
-                    onStatusChange={handleStatusChange}
-                    canScore={canScore}
-                  />
-                ))}
-              </div>
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-[#E7E5DE] bg-slate-50/70 text-[11.5px] font-bold text-slate-400 uppercase tracking-wider">
+                    <th className="py-3 px-4 w-10 text-center">
+                      <input type="checkbox" className="rounded border-slate-300 text-blue-600 focus:ring-0 cursor-pointer" />
+                    </th>
+                    <th className="py-3 px-4 font-semibold">Task Name</th>
+                    <th className="py-3 px-4 font-semibold">Assigned To</th>
+                    <th className="py-3 px-4 font-semibold">Priority</th>
+                    <th className="py-3 px-4 font-semibold">Due Date</th>
+                    <th className="py-3 px-4 font-semibold">Status</th>
+                    <th className="py-3 px-4 font-semibold text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#E7E5DE]/80 text-xs">
+                  {filteredDaily.map((act) => {
+                    const isDone = act.status === 'completed' || act.status === 'COMPLETED';
+                    const assigneeInitials = (act.assignee?.name || act.assigner?.name || 'SS')
+                      .split(' ')
+                      .map((n) => n[0])
+                      .join('')
+                      .toUpperCase()
+                      .slice(0, 2);
+
+                    return (
+                      <tr
+                        key={act.id}
+                        onClick={() => handleOpenInspector({ type: 'daily', data: act })}
+                        className="hover:bg-[#F7F6F2] transition-colors cursor-pointer group"
+                      >
+                        <td className="py-3 px-4 text-center" onClick={(e) => e.stopPropagation()}>
+                          <input
+                            type="checkbox"
+                            checked={isDone}
+                            onChange={() => handleToggleComplete({ type: 'daily', data: act })}
+                            className="rounded border-slate-300 text-blue-600 focus:ring-0 cursor-pointer"
+                          />
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className={`font-semibold text-navy ${isDone ? 'line-through text-slate-400' : ''}`}>
+                            {act.title}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4">
+                          <div className="flex items-center gap-2">
+                            <span className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-700 font-bold text-[10px] flex items-center justify-center shrink-0">
+                              {assigneeInitials}
+                            </span>
+                            <span className="font-medium text-slate-700">
+                              {act.assignee?.name || act.assigner?.name || 'Unassigned'}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="py-3 px-4">
+                          <span
+                            className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold capitalize ${
+                              act.priority === 'urgent'
+                                ? 'bg-rose-100 text-rose-700'
+                                : act.priority === 'high'
+                                ? 'bg-red-100 text-red-700'
+                                : act.priority === 'medium'
+                                ? 'bg-amber-100 text-amber-800'
+                                : 'bg-emerald-100 text-emerald-800'
+                            }`}
+                          >
+                            {act.priority}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 text-slate-600 font-medium">
+                          {act.due_date || act.scheduled_date ? fmtDate(act.due_date || act.scheduled_date || '') : '—'}
+                        </td>
+                        <td className="py-3 px-4">
+                          <span
+                            className={`inline-block px-3 py-1 rounded-full text-[11px] font-bold ${
+                              isDone
+                                ? 'bg-emerald-100 text-emerald-700'
+                                : 'bg-blue-100 text-blue-700'
+                            }`}
+                          >
+                            {isDone ? 'Completed' : 'In Progress'}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 text-right" onClick={(e) => e.stopPropagation()}>
+                          <div className="flex items-center justify-end gap-1 text-slate-400">
+                            <button
+                              type="button"
+                              onClick={() => handleOpenInspector({ type: 'daily', data: act })}
+                              className="p-1 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
+                              title="Inspect Task"
+                            >
+                              <ChevronRight size={16} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleToggleComplete({ type: 'daily', data: act })}
+                              className="p-1 hover:text-emerald-600 rounded-lg hover:bg-emerald-50 transition-colors"
+                              title={isDone ? 'Reopen' : 'Mark Completed'}
+                            >
+                              <CheckSquare size={16} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             )}
           </div>
+        </div>
 
-          {/* RIGHT COLUMN: STANDARD TICKETS */}
-          <div className="bg-[#FFFDF7] rounded-2xl border border-slate-200/80 p-4 sm:p-5 shadow-xs space-y-3.5">
-            {/* Column Header */}
-            <div className="flex items-center justify-between border-b border-slate-200/70 pb-3">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-amber-50 border border-amber-100 text-amber-700 flex items-center justify-center">
-                  <CheckSquare size={16} />
-                </div>
-                <div>
-                  <h3 className="font-black text-navy text-sm flex items-center gap-1.5">
-                    <span>Standard Project Tickets</span>
-                    <span className="text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200/70 px-2 py-0.5 rounded-full">
-                      {filteredStandard.length}
-                    </span>
-                  </h3>
-                  <p className="text-[10px] text-slate-400 font-medium">
-                    Deadlines, sprints &amp; ad-hoc assignments
-                  </p>
-                </div>
+        {/* ── SECTION 2: STANDARD TASKS (FULL-WIDTH HORIZONTAL CARD TABLE) ── */}
+        <div className="bg-[#FFFDF7] rounded-[20px] border border-[#E7E5DE] shadow-xs overflow-hidden transition-all duration-180 hover:border-slate-300">
+          {/* Section Header */}
+          <div className="p-5 sm:p-6 border-b border-[#E7E5DE] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100/80 text-amber-600 flex items-center justify-center shrink-0">
+                <Layers size={20} />
               </div>
-
-              <button
-                onClick={() => handleOpenCreateModal('standard')}
-                className="inline-flex items-center gap-1 text-xs bg-amber text-navy font-bold px-2.5 py-1.5 rounded-xl shadow-2xs hover:bg-amber-500 transition-colors cursor-pointer"
-              >
-                <Plus size={13} />
-                <span>+ Task</span>
-              </button>
+              <div>
+                <h2 className="text-[20px] font-bold text-navy leading-tight flex items-center gap-2">
+                  <span>Standard Tasks</span>
+                  <span className="text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200/70 px-2.5 py-0.5 rounded-full">
+                    {filteredStandard.length}
+                  </span>
+                </h2>
+                <p className="text-[12px] text-slate-400 font-medium mt-0.5">
+                  Predefined and recurring tasks &amp; project tickets
+                </p>
+              </div>
             </div>
 
-            {/* List / Cards */}
+            <div className="flex items-center gap-2.5 self-start sm:self-auto shrink-0">
+              <button
+                type="button"
+                onClick={() => handleOpenCreateModal('standard')}
+                className="inline-flex items-center justify-center gap-1.5 h-10 px-5 rounded-full text-xs font-bold bg-amber text-navy hover:bg-amber-500 shadow-xs transition-all duration-180 hover:-translate-y-0.5 active:scale-[0.98] cursor-pointer shrink-0"
+              >
+                <Plus size={15} className="text-navy" />
+                <span>+ Add Standard Task</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Inline Filter Bar */}
+          <div className="px-5 sm:px-6 py-3.5 bg-slate-50/50 border-b border-[#E7E5DE] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+            <div className="relative flex-1 max-w-md">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                placeholder="Search by task name, code, email, or description..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-4 h-9 text-xs border border-[#E7E5DE] rounded-full bg-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 text-navy font-medium transition-all"
+              />
+            </div>
+
+            <div className="flex items-center gap-2 flex-wrap">
+              <select
+                value={filters.priority}
+                onChange={(e) => setFilters({ ...filters, priority: e.target.value })}
+                className="h-9 px-3.5 rounded-full text-xs font-semibold bg-white border border-[#E7E5DE] text-slate-700 hover:bg-slate-50 focus:outline-none cursor-pointer"
+              >
+                <option value="all">All Priorities</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="urgent">Urgent</option>
+              </select>
+
+              <select
+                value={filters.status}
+                onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+                className="h-9 px-3.5 rounded-full text-xs font-semibold bg-white border border-[#E7E5DE] text-slate-700 hover:bg-slate-50 focus:outline-none cursor-pointer"
+              >
+                <option value="all">All Statuses</option>
+                <option value="todo">To Do</option>
+                <option value="in_progress">In Progress</option>
+                <option value="completed">Done</option>
+              </select>
+
+              <select
+                value={filters.assignedTo}
+                onChange={(e) => setFilters({ ...filters, assignedTo: e.target.value })}
+                className="h-9 px-3.5 rounded-full text-xs font-semibold bg-white border border-[#E7E5DE] text-slate-700 hover:bg-slate-50 focus:outline-none cursor-pointer"
+              >
+                <option value="">All Roles / Assignees</option>
+                {userList.map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.name} ({u.role})
+                  </option>
+                ))}
+              </select>
+
+              {activeFilterCount > 0 && (
+                <button
+                  type="button"
+                  onClick={handleResetFilters}
+                  className="h-9 px-3.5 rounded-full text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-200/80 hover:bg-rose-100 transition-colors cursor-pointer"
+                >
+                  Reset
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Table Container */}
+          <div className="overflow-x-auto">
             {filteredStandard.length === 0 ? (
-              <div className="py-10 text-center text-slate-400 text-xs">
-                No standard tasks found matching the active filters.
-              </div>
-            ) : viewMode === 'line' ? (
-              <div className="space-y-1.5">
-                {filteredStandard.map((task) => (
-                  <TaskItemRow
-                    key={task.id}
-                    item={{ type: 'standard', data: task }}
-                    onSelect={handleOpenInspector}
-                    onToggleComplete={handleToggleComplete}
-                    onStatusChange={handleStatusChange}
-                    canScore={canScore}
-                  />
-                ))}
+              <div className="py-16 text-center space-y-2">
+                <div className="w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mx-auto">
+                  <CheckSquare size={22} />
+                </div>
+                <h4 className="text-sm font-bold text-navy">No standard tasks found</h4>
+                <p className="text-xs text-slate-400">Create a standard ticket to track ongoing sprint deliverables.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {filteredStandard.map((task) => (
-                  <TaskItemCard
-                    key={task.id}
-                    item={{ type: 'standard', data: task }}
-                    onSelect={handleOpenInspector}
-                    onToggleComplete={handleToggleComplete}
-                    onStatusChange={handleStatusChange}
-                    canScore={canScore}
-                  />
-                ))}
-              </div>
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-[#E7E5DE] bg-slate-50/70 text-[11.5px] font-bold text-slate-400 uppercase tracking-wider">
+                    <th className="py-3 px-4 w-10 text-center">
+                      <input type="checkbox" className="rounded border-slate-300 text-amber-500 focus:ring-0 cursor-pointer" />
+                    </th>
+                    <th className="py-3 px-4 font-semibold">Task Name</th>
+                    <th className="py-3 px-4 font-semibold">Assigned To</th>
+                    <th className="py-3 px-4 font-semibold">Role</th>
+                    <th className="py-3 px-4 font-semibold">Due Date</th>
+                    <th className="py-3 px-4 font-semibold">Status</th>
+                    <th className="py-3 px-4 font-semibold text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#E7E5DE]/80 text-xs">
+                  {filteredStandard.map((task) => {
+                    const isDone = task.status === 'done';
+                    return (
+                      <tr
+                        key={task.id}
+                        onClick={() => handleOpenInspector({ type: 'standard', data: task })}
+                        className="hover:bg-[#F7F6F2] transition-colors cursor-pointer group"
+                      >
+                        <td className="py-3 px-4 text-center" onClick={(e) => e.stopPropagation()}>
+                          <input
+                            type="checkbox"
+                            checked={isDone}
+                            onChange={() => handleToggleComplete({ type: 'standard', data: task })}
+                            className="rounded border-slate-300 text-amber-500 focus:ring-0 cursor-pointer"
+                          />
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className={`font-semibold text-navy ${isDone ? 'line-through text-slate-400' : ''}`}>
+                            {task.title}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4">
+                          <div className="flex items-center gap-2">
+                            <span className="w-6 h-6 rounded-full bg-amber-100 text-amber-800 font-bold text-[10px] flex items-center justify-center shrink-0">
+                              {(task.assignedUser?.name || 'U').slice(0, 2).toUpperCase()}
+                            </span>
+                            <span className="font-medium text-slate-700">
+                              {task.assignedUser?.name || 'Unassigned'}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className="inline-block px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200/60">
+                            {task.assignedUser?.role || 'Staff'}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 text-slate-600 font-medium">
+                          {task.due_date ? fmtDate(task.due_date) : '—'}
+                        </td>
+                        <td className="py-3 px-4">
+                          <span
+                            className={`inline-block px-3 py-1 rounded-full text-[11px] font-bold capitalize ${
+                              isDone
+                                ? 'bg-emerald-100 text-emerald-700'
+                                : task.status === 'in_progress'
+                                ? 'bg-amber-100 text-amber-800'
+                                : 'bg-slate-100 text-slate-700'
+                            }`}
+                          >
+                            {task.status.replace('_', ' ')}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 text-right" onClick={(e) => e.stopPropagation()}>
+                          <div className="flex items-center justify-end gap-1 text-slate-400">
+                            <button
+                              type="button"
+                              onClick={() => handleOpenInspector({ type: 'standard', data: task })}
+                              className="p-1 hover:text-amber-600 rounded-lg hover:bg-amber-50 transition-colors"
+                              title="Inspect Task"
+                            >
+                              <ChevronRight size={16} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleOpenEdit(task)}
+                              className="p-1 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
+                              title="Edit Task"
+                            >
+                              <Pencil size={15} />
+                            </button>
+                            {canDelete(task) && (
+                              <button
+                                type="button"
+                                onClick={() => setDeleteTarget(task)}
+                                className="p-1 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors"
+                                title="Delete Task"
+                              >
+                                <Trash2 size={15} />
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             )}
           </div>
         </div>
-      ) : (
-        /* ═══════════════════════════════════════════════════════════════════ */
-        /* MODE B: UNIFIED STREAM VIEW (SINGLE CHRONOLOGICAL MASTER FEED)     */
-        /* ═══════════════════════════════════════════════════════════════════ */
-        <div className="bg-[#FFFDF7] rounded-2xl border border-slate-200/80 p-4 sm:p-5 shadow-xs space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-200/70 pb-3">
-            <div>
-              <h3 className="font-black text-navy text-sm sm:text-base flex items-center gap-2">
-                <span>Unified Operations Ledger</span>
-                <span className="text-[11px] font-bold bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-full border border-slate-200">
-                  {unifiedStreamItems.length} Total Tasks
-                </span>
-              </h3>
-              <p className="text-xs text-slate-400 font-medium">
-                Harmonized timeline of both daily SOPs and standard project tickets
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => handleOpenCreateModal('daily')}
-                className="text-xs bg-teal-50 text-teal-800 border border-teal-200 font-bold px-3 py-1.5 rounded-xl hover:bg-teal-100 transition-colors"
-              >
-                + Daily
-              </button>
-              <button
-                onClick={() => handleOpenCreateModal('standard')}
-                className="text-xs bg-amber text-navy font-bold px-3 py-1.5 rounded-xl hover:bg-amber-500 transition-colors"
-              >
-                + Standard
-              </button>
-            </div>
-          </div>
-
-          {unifiedStreamItems.length === 0 ? (
-            <div className="py-16 text-center text-slate-400 text-xs">
-              No tasks found in the unified feed for the selected criteria.
-            </div>
-          ) : viewMode === 'line' ? (
-            <div className="space-y-1.5">
-              {unifiedStreamItems.map((item) => (
-                <TaskItemRow
-                  key={`${item.type}-${item.data.id}`}
-                  item={item}
-                  onSelect={handleOpenInspector}
-                  onToggleComplete={handleToggleComplete}
-                  onStatusChange={handleStatusChange}
-                  canScore={canScore}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {unifiedStreamItems.map((item) => (
-                <TaskItemCard
-                  key={`${item.type}-${item.data.id}`}
-                  item={item}
-                  onSelect={handleOpenInspector}
-                  onToggleComplete={handleToggleComplete}
-                  onStatusChange={handleStatusChange}
-                  canScore={canScore}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+      </div>
 
       {/* ── 4. SLIDE-OVER TOGGLE WINDOW: TASK DETAIL INSPECTOR ── */}
       <TaskDetailDrawer

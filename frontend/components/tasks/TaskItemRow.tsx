@@ -59,10 +59,10 @@ export default function TaskItemRow({
   return (
     <div
       onClick={() => onSelect(item)}
-      className={`group relative flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl border transition-all duration-150 cursor-pointer ${
+      className={`group relative flex items-center justify-between gap-3 px-4 py-3 rounded-2xl border transition-all duration-180 cursor-pointer ${
         isDone
-          ? 'bg-slate-50/70 border-slate-200/50 opacity-75'
-          : 'bg-white border-slate-200/80 hover:border-amber/50 hover:shadow-xs'
+          ? 'bg-slate-50/70 border-[#E7E5DE]/60 opacity-75'
+          : 'bg-white border-[#E7E5DE] hover:border-slate-300 hover:bg-[#F7F6F2] hover:shadow-xs'
       }`}
     >
       {/* Left: Checkbox + Icon Badge + Title */}

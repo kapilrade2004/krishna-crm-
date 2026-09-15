@@ -110,182 +110,240 @@ export default function DashboardPage() {
             {/* ══════════════════════════════════════════════════════════════
                 ROW 1: 3 KPI CONTAINER CARDS (Orders & Sales, Customers, Ops)
                 ══════════════════════════════════════════════════════════════ */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5">
+            <div className="space-y-4">
+              {/* Group 1 & Group 2 in balanced columns */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                {/* Orders & Sales (4 Cards) */}
+                <div className="lg:col-span-7 bg-white rounded-2xl p-5 border border-slate-200/90 shadow-2xs">
+                  <div className="flex items-center justify-between mb-3.5 pb-2.5 border-b border-slate-100">
+                    <div className="flex items-center gap-2.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-blue-500 shrink-0"></span>
+                      <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Orders & Sales</h3>
+                    </div>
+                    <span className="text-[11px] font-medium text-slate-400">Live Volume</span>
+                  </div>
 
-              {/* CARD 1: Orders & Sales (4 Sub-Cards) */}
-              <div className="lg:col-span-4 bg-white rounded-2xl p-3.5 border border-slate-200/80 shadow-2xs flex flex-col justify-between">
-                <div className="flex items-center gap-1.5 mb-2.5">
-                  <span className="text-blue-500 text-xs">✦</span>
-                  <h3 className="text-xs font-bold text-slate-800 tracking-tight">Orders & Sales</h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {/* Total Orders */}
+                    <div className="bg-[#faf8ff] rounded-xl p-3 border border-purple-100/80 hover:border-purple-200 transition-all flex flex-col justify-between">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[10px] font-bold text-purple-700/80 uppercase tracking-wider">Total</span>
+                        <div className="w-7 h-7 rounded-lg bg-purple-100/80 text-purple-600 flex items-center justify-center">
+                          <Package size={14} strokeWidth={2.2} />
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-xl font-bold font-mono text-slate-900 leading-tight">{totalOrders}</p>
+                        <p className="text-[10px] font-semibold text-emerald-600 mt-1 flex items-center gap-1">
+                          ↑ 12% <span className="font-normal text-slate-400">vs last 7d</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Pending Verification */}
+                    <div className="bg-[#fffcf7] rounded-xl p-3 border border-amber-100/80 hover:border-amber-200 transition-all flex flex-col justify-between">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[10px] font-bold text-amber-700/80 uppercase tracking-wider">Verify</span>
+                        <div className="w-7 h-7 rounded-lg bg-amber-100/80 text-amber-600 flex items-center justify-center">
+                          <Clock size={14} strokeWidth={2.2} />
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-xl font-bold font-mono text-slate-900 leading-tight">{pendingOrders}</p>
+                        <p className="text-[10px] font-semibold text-amber-600 mt-1 flex items-center gap-1">
+                          ↑ 8% <span className="font-normal text-slate-400">vs last 7d</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Total Revenue */}
+                    <div className="bg-[#f7fcf9] rounded-xl p-3 border border-emerald-100/80 hover:border-emerald-200 transition-all flex flex-col justify-between">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[10px] font-bold text-emerald-700/80 uppercase tracking-wider">Revenue</span>
+                        <div className="w-7 h-7 rounded-lg bg-emerald-100/80 text-emerald-600 flex items-center justify-center">
+                          <IndianRupee size={14} strokeWidth={2.2} />
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-xl font-bold font-mono text-slate-900 leading-tight">{totalRevenueFormatted}</p>
+                        <p className="text-[10px] font-medium text-slate-400 mt-1 flex items-center gap-1">
+                          — 0% <span className="font-normal">vs last 7d</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Confirmed Orders */}
+                    <div className="bg-[#f8faff] rounded-xl p-3 border border-blue-100/80 hover:border-blue-200 transition-all flex flex-col justify-between">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[10px] font-bold text-blue-700/80 uppercase tracking-wider">Confirmed</span>
+                        <div className="w-7 h-7 rounded-lg bg-blue-100/80 text-blue-600 flex items-center justify-center">
+                          <CheckCircle2 size={14} strokeWidth={2.2} />
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-xl font-bold font-mono text-slate-900 leading-tight">{confirmedOrders}</p>
+                        <p className="text-[10px] font-semibold text-blue-600 mt-1 flex items-center gap-1">
+                          ↑ 100% <span className="font-normal text-slate-400">vs last 7d</span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-4 gap-2">
-                  {/* Total Orders */}
-                  <div className="bg-blue-50/50 rounded-xl p-2.5 border border-blue-100/80 hover:bg-blue-50/70 hover:border-blue-200 transition-all flex flex-col justify-between">
-                    <div className="w-6 h-6 rounded-lg bg-blue-100/80 text-blue-600 flex items-center justify-center mb-1 shadow-2xs">
-                      <Package size={13} strokeWidth={2.2} />
+                {/* Customers & Conversion (3 Cards) */}
+                <div className="lg:col-span-5 bg-white rounded-2xl p-5 border border-slate-200/90 shadow-2xs">
+                  <div className="flex items-center justify-between mb-3.5 pb-2.5 border-b border-slate-100">
+                    <div className="flex items-center gap-2.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0"></span>
+                      <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Customers & Conversion</h3>
                     </div>
-                    <div>
-                      <p className="text-[9px] font-bold text-blue-600/75 uppercase tracking-wider truncate">TOTAL ORDERS</p>
-                      <p className="text-lg font-black text-slate-900 leading-tight my-0.5">{totalOrders}</p>
-                      <p className="text-[8.5px] font-semibold text-emerald-600 leading-tight">↑ 12% <span className="font-normal text-slate-400">vs last 7 days</span></p>
-                    </div>
+                    <span className="text-[11px] font-medium text-slate-400">Accounts</span>
                   </div>
 
-                  {/* Pending Verification */}
-                  <div className="bg-amber-50/50 rounded-xl p-2.5 border border-amber-100/80 hover:bg-amber-50/70 hover:border-amber-200 transition-all flex flex-col justify-between">
-                    <div className="w-6 h-6 rounded-lg bg-amber-100/80 text-amber-600 flex items-center justify-center mb-1 shadow-2xs">
-                      <Clock size={13} strokeWidth={2.2} />
+                  <div className="grid grid-cols-3 gap-3">
+                    {/* Total Customers */}
+                    <div className="bg-sky-50/40 rounded-xl p-3 border border-sky-100/80 hover:border-sky-200 transition-all flex flex-col justify-between">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[10px] font-bold text-sky-700/80 uppercase tracking-wider">Total</span>
+                        <div className="w-7 h-7 rounded-lg bg-sky-100/80 text-sky-600 flex items-center justify-center">
+                          <User size={14} strokeWidth={2.2} />
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-xl font-bold font-mono text-slate-900 leading-tight">{totalCustomers}</p>
+                        <p className="text-[10px] font-medium text-slate-400 mt-1 flex items-center gap-1">
+                          — 0% <span className="font-normal">vs last 7d</span>
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-[9px] font-bold text-amber-600/75 uppercase tracking-wider truncate">PENDING VERIFICATION</p>
-                      <p className="text-lg font-black text-slate-900 leading-tight my-0.5">{pendingOrders}</p>
-                      <p className="text-[8.5px] font-semibold text-amber-600 leading-tight">↑ 8% <span className="font-normal text-slate-400">vs last 7 days</span></p>
-                    </div>
-                  </div>
 
-                  {/* Total Revenue */}
-                  <div className="bg-emerald-50/50 rounded-xl p-2.5 border border-emerald-100/80 hover:bg-emerald-50/70 hover:border-emerald-200 transition-all flex flex-col justify-between">
-                    <div className="w-6 h-6 rounded-lg bg-emerald-100/80 text-emerald-600 flex items-center justify-center mb-1 shadow-2xs">
-                      <IndianRupee size={13} strokeWidth={2.2} />
+                    {/* Customers Active */}
+                    <div className="bg-emerald-50/40 rounded-xl p-3 border border-emerald-100/80 hover:border-emerald-200 transition-all flex flex-col justify-between">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[10px] font-bold text-emerald-700/80 uppercase tracking-wider">Active</span>
+                        <div className="w-7 h-7 rounded-lg bg-emerald-100/80 text-emerald-600 flex items-center justify-center">
+                          <UserCheck size={14} strokeWidth={2.2} />
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-xl font-bold font-mono text-slate-900 leading-tight">{activeCustomers}</p>
+                        <p className="text-[10px] font-semibold text-emerald-600 mt-1 flex items-center gap-1">
+                          ↑ 100% <span className="font-normal text-slate-400">vs last 7d</span>
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-[9px] font-bold text-emerald-600/75 uppercase tracking-wider truncate">TOTAL REVENUE</p>
-                      <p className="text-lg font-black text-slate-900 leading-tight my-0.5">{totalRevenueFormatted}</p>
-                      <p className="text-[8.5px] font-medium text-slate-400 leading-tight">— 0% <span className="font-normal">vs last 7 days</span></p>
-                    </div>
-                  </div>
 
-                  {/* Confirmed Orders */}
-                  <div className="bg-teal-50/50 rounded-xl p-2.5 border border-teal-100/80 hover:bg-teal-50/70 hover:border-teal-200 transition-all flex flex-col justify-between">
-                    <div className="w-6 h-6 rounded-lg bg-teal-100/80 text-teal-600 flex items-center justify-center mb-1 shadow-2xs">
-                      <CheckCircle2 size={13} strokeWidth={2.2} />
-                    </div>
-                    <div>
-                      <p className="text-[9px] font-bold text-teal-600/75 uppercase tracking-wider truncate">CONFIRMED ORDERS</p>
-                      <p className="text-lg font-black text-slate-900 leading-tight my-0.5">{confirmedOrders}</p>
-                      <p className="text-[8.5px] font-semibold text-teal-600 leading-tight">↑ 100% <span className="font-normal text-slate-400">vs last 7 days</span></p>
+                    {/* Top New Customers */}
+                    <div className="bg-indigo-50/40 rounded-xl p-3 border border-indigo-100/80 hover:border-indigo-200 transition-all flex flex-col justify-between">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[10px] font-bold text-indigo-700/80 uppercase tracking-wider">New</span>
+                        <div className="w-7 h-7 rounded-lg bg-indigo-100/80 text-indigo-600 flex items-center justify-center">
+                          <Star size={14} strokeWidth={2.2} className="fill-indigo-500 text-indigo-500" />
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-xl font-bold font-mono text-slate-900 leading-tight">{newCustomers}</p>
+                        <p className="text-[10px] font-medium text-slate-400 mt-1 flex items-center gap-1">
+                          — 0% <span className="font-normal">vs last 7d</span>
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* CARD 2: Customers & Conversion Platform (3 Sub-Cards) */}
-              <div className="lg:col-span-3 bg-white rounded-2xl p-3.5 border border-slate-200/80 shadow-2xs flex flex-col justify-between">
-                <div className="flex items-center gap-1.5 mb-2.5">
-                  <span className="text-emerald-500 text-xs">✦</span>
-                  <h3 className="text-xs font-bold text-slate-800 tracking-tight">Customers & Conversion Platform</h3>
+              {/* Group 3: Operations & Warranty Performance (5 full-width cards) */}
+              <div className="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-2xs">
+                <div className="flex items-center justify-between mb-3.5 pb-2.5 border-b border-slate-100">
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-purple-500 shrink-0"></span>
+                    <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Operations & Warranty Performance</h3>
+                  </div>
+                  <span className="text-[11px] font-medium text-slate-400">Compliance & SLAs</span>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2">
-                  {/* Total Customers */}
-                  <div className="bg-sky-50/50 rounded-xl p-2.5 border border-sky-100/80 hover:bg-sky-50/70 hover:border-sky-200 transition-all flex flex-col justify-between">
-                    <div className="w-6 h-6 rounded-lg bg-sky-100/80 text-sky-600 flex items-center justify-center mb-1 shadow-2xs">
-                      <User size={13} strokeWidth={2.2} />
-                    </div>
-                    <div>
-                      <p className="text-[9px] font-bold text-sky-600/75 uppercase tracking-wider truncate">TOTAL CUSTOMERS</p>
-                      <p className="text-lg font-black text-slate-900 leading-tight my-0.5">{totalCustomers}</p>
-                      <p className="text-[8.5px] font-medium text-slate-400 leading-tight">— 0% <span className="font-normal">vs last 7 days</span></p>
-                    </div>
-                  </div>
-
-                  {/* Customers Active */}
-                  <div className="bg-emerald-50/50 rounded-xl p-2.5 border border-emerald-100/80 hover:bg-emerald-50/70 hover:border-emerald-200 transition-all flex flex-col justify-between">
-                    <div className="w-6 h-6 rounded-lg bg-emerald-100/80 text-emerald-600 flex items-center justify-center mb-1 shadow-2xs">
-                      <UserCheck size={13} strokeWidth={2.2} />
-                    </div>
-                    <div>
-                      <p className="text-[9px] font-bold text-emerald-600/75 uppercase tracking-wider truncate">CUSTOMERS ACTIVE</p>
-                      <p className="text-lg font-black text-slate-900 leading-tight my-0.5">{activeCustomers}</p>
-                      <p className="text-[8.5px] font-semibold text-emerald-600 leading-tight">↑ 100% <span className="font-normal text-slate-400">vs last 7 days</span></p>
-                    </div>
-                  </div>
-
-                  {/* Top New Customers */}
-                  <div className="bg-indigo-50/50 rounded-xl p-2.5 border border-indigo-100/80 hover:bg-indigo-50/70 hover:border-indigo-200 transition-all flex flex-col justify-between">
-                    <div className="w-6 h-6 rounded-lg bg-indigo-100/80 text-indigo-600 flex items-center justify-center mb-1 shadow-2xs">
-                      <Star size={13} strokeWidth={2.2} className="fill-indigo-500 text-indigo-500" />
-                    </div>
-                    <div>
-                      <p className="text-[9px] font-bold text-indigo-600/75 uppercase tracking-wider truncate">TOP NEW CUSTOMERS</p>
-                      <p className="text-lg font-black text-slate-900 leading-tight my-0.5">{newCustomers}</p>
-                      <p className="text-[8.5px] font-medium text-slate-400 leading-tight">— 0% <span className="font-normal">vs last 7 days</span></p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* CARD 3: Operations & Warranty Performance (5 Sub-Cards) */}
-              <div className="lg:col-span-5 bg-white rounded-2xl p-3.5 border border-slate-200/80 shadow-2xs flex flex-col justify-between">
-                <div className="flex items-center gap-1.5 mb-2.5">
-                  <span className="text-purple-500 text-xs">✦</span>
-                  <h3 className="text-xs font-bold text-slate-800 tracking-tight">Operations & Warranty Performance</h3>
-                </div>
-
-                <div className="grid grid-cols-5 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
                   {/* Pending Orders */}
-                  <div className="bg-amber-50/50 rounded-xl p-2.5 border border-amber-100/80 hover:bg-amber-50/70 hover:border-amber-200 transition-all flex flex-col justify-between">
-                    <div className="w-6 h-6 rounded-lg bg-amber-100/80 text-amber-600 flex items-center justify-center mb-1 shadow-2xs">
-                      <Clock size={13} strokeWidth={2.2} />
+                  <div className="bg-amber-50/35 rounded-xl p-3.5 border border-amber-100/90 hover:border-amber-200 transition-all flex flex-col justify-between">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] font-bold text-amber-800/80 uppercase tracking-wider">Pending Orders</span>
+                      <div className="w-7 h-7 rounded-lg bg-amber-100/80 text-amber-600 flex items-center justify-center">
+                        <Clock size={14} strokeWidth={2.2} />
+                      </div>
                     </div>
                     <div>
-                      <p className="text-[9px] font-bold text-amber-600/75 uppercase tracking-wider truncate">PENDING ORDERS</p>
-                      <p className="text-lg font-black text-slate-900 leading-tight my-0.5">{pendingOrders}</p>
-                      <p className="text-[8.5px] font-semibold text-amber-600 leading-tight">↑ 8% <span className="font-normal text-slate-400">vs last 7 days</span></p>
+                      <p className="text-2xl font-bold font-mono text-slate-900 leading-tight">{pendingOrders}</p>
+                      <p className="text-[10px] font-semibold text-amber-600 mt-1 flex items-center gap-1">
+                        ↑ 8% <span className="font-normal text-slate-400">vs last 7d</span>
+                      </p>
                     </div>
                   </div>
 
                   {/* Warranty Active */}
-                  <div className="bg-teal-50/50 rounded-xl p-2.5 border border-teal-100/80 hover:bg-teal-50/70 hover:border-teal-200 transition-all flex flex-col justify-between">
-                    <div className="w-6 h-6 rounded-lg bg-teal-100/80 text-teal-600 flex items-center justify-center mb-1 shadow-2xs">
-                      <ShieldCheck size={13} strokeWidth={2.2} />
+                  <div className="bg-teal-50/35 rounded-xl p-3.5 border border-teal-100/90 hover:border-teal-200 transition-all flex flex-col justify-between">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] font-bold text-teal-800/80 uppercase tracking-wider">Active Warranty</span>
+                      <div className="w-7 h-7 rounded-lg bg-teal-100/80 text-teal-600 flex items-center justify-center">
+                        <ShieldCheck size={14} strokeWidth={2.2} />
+                      </div>
                     </div>
                     <div>
-                      <p className="text-[9px] font-bold text-teal-600/75 uppercase tracking-wider truncate">WARRANTY ACTIVE</p>
-                      <p className="text-lg font-black text-slate-900 leading-tight my-0.5">{activeWarranty}</p>
-                      <p className="text-[8.5px] font-medium text-slate-400 leading-tight">— 0% <span className="font-normal">vs last 7 days</span></p>
+                      <p className="text-2xl font-bold font-mono text-slate-900 leading-tight">{activeWarranty}</p>
+                      <p className="text-[10px] font-medium text-slate-400 mt-1 flex items-center gap-1">
+                        — 0% <span className="font-normal">vs last 7d</span>
+                      </p>
                     </div>
                   </div>
 
                   {/* Employees Onboarding */}
-                  <div className="bg-blue-50/50 rounded-xl p-2.5 border border-blue-100/80 hover:bg-blue-50/70 hover:border-blue-200 transition-all flex flex-col justify-between">
-                    <div className="w-6 h-6 rounded-lg bg-blue-100/80 text-blue-600 flex items-center justify-center mb-1 shadow-2xs">
-                      <User size={13} strokeWidth={2.2} />
+                  <div className="bg-blue-50/35 rounded-xl p-3.5 border border-blue-100/90 hover:border-blue-200 transition-all flex flex-col justify-between">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] font-bold text-blue-800/80 uppercase tracking-wider">Onboarding Staff</span>
+                      <div className="w-7 h-7 rounded-lg bg-blue-100/80 text-blue-600 flex items-center justify-center">
+                        <User size={14} strokeWidth={2.2} />
+                      </div>
                     </div>
                     <div>
-                      <p className="text-[9px] font-bold text-blue-600/75 uppercase tracking-wider truncate">EMPLOYEES ONBOARDING</p>
-                      <p className="text-lg font-black text-slate-900 leading-tight my-0.5">{pendingOnboarding}</p>
-                      <p className="text-[8.5px] font-medium text-slate-400 leading-tight">— 0% <span className="font-normal">vs last 7 days</span></p>
+                      <p className="text-2xl font-bold font-mono text-slate-900 leading-tight">{pendingOnboarding}</p>
+                      <p className="text-[10px] font-medium text-slate-400 mt-1 flex items-center gap-1">
+                        — 0% <span className="font-normal">vs last 7d</span>
+                      </p>
                     </div>
                   </div>
 
                   {/* Pending Documents */}
-                  <div className="bg-rose-50/50 rounded-xl p-2.5 border border-rose-100/80 hover:bg-rose-50/70 hover:border-rose-200 transition-all flex flex-col justify-between">
-                    <div className="w-6 h-6 rounded-lg bg-rose-100/80 text-rose-600 flex items-center justify-center mb-1 shadow-2xs">
-                      <FileText size={13} strokeWidth={2.2} />
+                  <div className="bg-rose-50/35 rounded-xl p-3.5 border border-rose-100/90 hover:border-rose-200 transition-all flex flex-col justify-between">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] font-bold text-rose-800/80 uppercase tracking-wider">Pending Docs</span>
+                      <div className="w-7 h-7 rounded-lg bg-rose-100/80 text-rose-600 flex items-center justify-center">
+                        <FileText size={14} strokeWidth={2.2} />
+                      </div>
                     </div>
                     <div>
-                      <p className="text-[9px] font-bold text-rose-600/75 uppercase tracking-wider truncate">PENDING DOCUMENTS</p>
-                      <p className="text-lg font-black text-slate-900 leading-tight my-0.5">{pendingDocs}</p>
-                      <p className="text-[8.5px] font-medium text-slate-400 leading-tight">— 0% <span className="font-normal">vs last 7 days</span></p>
+                      <p className="text-2xl font-bold font-mono text-slate-900 leading-tight">{pendingDocs}</p>
+                      <p className="text-[10px] font-medium text-slate-400 mt-1 flex items-center gap-1">
+                        — 0% <span className="font-normal">vs last 7d</span>
+                      </p>
                     </div>
                   </div>
 
                   {/* Employee Audit */}
-                  <div className="bg-purple-50/50 rounded-xl p-2.5 border border-purple-100/80 hover:bg-purple-50/70 hover:border-purple-200 transition-all flex flex-col justify-between">
-                    <div className="w-6 h-6 rounded-lg bg-purple-100/80 text-purple-600 flex items-center justify-center mb-1 shadow-2xs">
-                      <ShieldCheck size={13} strokeWidth={2.2} />
+                  <div className="bg-purple-50/35 rounded-xl p-3.5 border border-purple-100/90 hover:border-purple-200 transition-all flex flex-col justify-between">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] font-bold text-purple-800/80 uppercase tracking-wider">Audit Alerts</span>
+                      <div className="w-7 h-7 rounded-lg bg-purple-100/80 text-purple-600 flex items-center justify-center">
+                        <ShieldCheck size={14} strokeWidth={2.2} />
+                      </div>
                     </div>
                     <div>
-                      <p className="text-[9px] font-bold text-purple-600/75 uppercase tracking-wider truncate">EMPLOYEE AUDIT</p>
-                      <p className="text-lg font-black text-slate-900 leading-tight my-0.5">0</p>
-                      <p className="text-[8.5px] font-medium text-slate-400 leading-tight">— 0% <span className="font-normal">vs last 7 days</span></p>
+                      <p className="text-2xl font-bold font-mono text-slate-900 leading-tight">0</p>
+                      <p className="text-[10px] font-medium text-slate-400 mt-1 flex items-center gap-1">
+                        — 0% <span className="font-normal">vs last 7d</span>
+                      </p>
                     </div>
                   </div>
                 </div>
               </div>
-
             </div>
 
             {/* ══════════════════════════════════════════════════════════════

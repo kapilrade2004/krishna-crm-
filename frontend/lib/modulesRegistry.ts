@@ -65,6 +65,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     description: 'Product review auditing, rating collection verification and compliance',
   },
   */
+  /*
   {
     key: 'telecaller',
     label: 'Telecaller Suite',
@@ -75,6 +76,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     capabilities: ['confirmation_calling', 'easyship_ratings', 'cancellation_report', '95_percent_target'],
     description: 'Order confirmation calls, Amazon Easyship rating collection, customer issue resolution',
   },
+  */
   /*
   {
     key: 'accounting',

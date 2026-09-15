@@ -8,18 +8,48 @@ import Topbar from '@/components/layout/Topbar';
 import api from '@/lib/api';
 import toast from 'react-hot-toast';
 import {
-  Badge, Button, Input, Select, Modal, PageLoader, EmptyState,
+  Button, Input, Select, Modal, PageLoader, EmptyState,
 } from '@/components/ui';
-import { Search, Plus, Users, ChevronRight, FileText, UserMinus, Building2, ShieldCheck, RefreshCw, Trash2, AlertTriangle } from 'lucide-react';
+import {
+  Search,
+  Plus,
+  Users,
+  ChevronRight,
+  ChevronLeft,
+  FileText,
+  Building2,
+  RefreshCw,
+  Trash2,
+  AlertTriangle,
+  UserCheck,
+  UserX,
+  Clock,
+  Briefcase,
+  MoreVertical,
+  ArrowUpRight
+} from 'lucide-react';
 import { fmtDate } from '@/lib/utils';
 import { useAuthStore } from '@/lib/auth';
 import type { Employee, EmploymentType } from '@/types';
 
-const STATUS_PILLS: Record<string, string> = {
-  active: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  inactive: 'bg-gray-100 text-gray-700 border-gray-200',
-  terminated: 'bg-red-50 text-red-700 border-red-200',
-};
+const AVATAR_PALETTES = [
+  { bg: 'bg-indigo-50', text: 'text-indigo-700', border: 'border-indigo-200/80 ring-1 ring-indigo-500/10' },
+  { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200/80 ring-1 ring-blue-500/10' },
+  { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200/80 ring-1 ring-emerald-500/10' },
+  { bg: 'bg-amber-50', text: 'text-amber-800', border: 'border-amber-200/80 ring-1 ring-amber-500/10' },
+  { bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200/80 ring-1 ring-purple-500/10' },
+  { bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-200/80 ring-1 ring-rose-500/10' },
+  { bg: 'bg-teal-50', text: 'text-teal-700', border: 'border-teal-200/80 ring-1 ring-teal-500/10' },
+  { bg: 'bg-cyan-50', text: 'text-cyan-700', border: 'border-cyan-200/80 ring-1 ring-cyan-500/10' },
+];
+
+function getAvatarStyle(name: string) {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return AVATAR_PALETTES[Math.abs(hash) % AVATAR_PALETTES.length];
+}
 
 const emptyForm = {
   first_name: '',
@@ -49,6 +79,11 @@ export default function EmployeesPage() {
   const [deptFilter, setDeptFilter] = useState('all');
   const [roleFilter, setRoleFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
+
+  // Pagination & selection
+  const [selectedIds, setSelectedIds] = useState<Record<string, boolean>>({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   // Modals
   const [createModal, setCreateModal] = useState(false);
@@ -132,6 +167,38 @@ export default function EmployeesPage() {
     });
   }, [employees, deptFilter, statusFilter, roleFilter, searchQuery]);
 
+  // Paginated items
+  const totalPages = Math.max(1, Math.ceil(filteredEmployees.length / pageSize));
+  const paginatedEmployees = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredEmployees.slice(start, start + pageSize);
+  }, [filteredEmployees, currentPage, pageSize]);
+
+  // Selection handlers
+  const isAllSelected = paginatedEmployees.length > 0 && paginatedEmployees.every((e) => selectedIds[e.id]);
+  const toggleSelectAll = () => {
+    if (isAllSelected) {
+      const next = { ...selectedIds };
+      paginatedEmployees.forEach((e) => delete next[e.id]);
+      setSelectedIds(next);
+    } else {
+      const next = { ...selectedIds };
+      paginatedEmployees.forEach((e) => {
+        next[e.id] = true;
+      });
+      setSelectedIds(next);
+    }
+  };
+
+  const toggleSelectOne = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = { ...prev };
+      if (next[id]) delete next[id];
+      else next[id] = true;
+      return next;
+    });
+  };
+
   const handleCreateEmployee = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.first_name.trim() || !form.last_name.trim()) {
@@ -152,218 +219,460 @@ export default function EmployeesPage() {
     }
   };
 
+  // Metrics calculations
+  const totalCount = employees.length;
   const activeCount = employees.filter((e) => e.status === 'active').length;
+  const inactiveCount = employees.filter((e) => e.status === 'inactive' || e.status === 'terminated').length;
   const pendingOnboarding = employees.filter((e) => e.onboarding_status !== 'completed').length;
+  const departmentCount = departmentOptions.length || (totalCount > 0 ? 1 : 0);
 
   return (
     <AppShell>
       <Topbar
         title="Employee Directory & HR"
-        subtitle="Single source of truth for active and offboarded team members"
+        subtitle="Manage your team, roles, and employee information in one place."
       />
 
-      <main className="flex-1 overflow-y-auto p-6 w-full">
-        <div className="space-y-6 max-w-7xl mx-auto pb-12">
-          {/* KPI Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <div className="bg-white p-4 border border-gray-200 rounded-2xl shadow-sm text-center">
-            <span className="text-xs text-gray-500 font-semibold">Total Workforce</span>
-            <p className="text-2xl font-bold text-gray-900 mt-1">{employees.length}</p>
-          </div>
-          <div className="bg-white p-4 border border-gray-200 rounded-2xl shadow-sm text-center">
-            <span className="text-xs text-gray-500 font-semibold">Active Staff</span>
-            <p className="text-2xl font-bold text-emerald-600 mt-1">{activeCount}</p>
-          </div>
-          <div className="bg-white p-4 border border-gray-200 rounded-2xl shadow-sm text-center">
-            <span className="text-xs text-gray-500 font-semibold">Onboarding In Progress</span>
-            <p className="text-2xl font-bold text-amber-600 mt-1">{pendingOnboarding}</p>
-          </div>
-          <div className="bg-white p-4 border border-gray-200 rounded-2xl shadow-sm text-center">
-            <span className="text-xs text-gray-500 font-semibold">Departments</span>
-            <p className="text-2xl font-bold text-blue-600 mt-1">{departmentOptions.length || 1}</p>
-          </div>
-        </div>
+      <main className="flex-1 overflow-y-auto px-6 py-6 w-full bg-[#f8fafc]">
+        <div className="space-y-5 max-w-[1400px] mx-auto pb-12">
+          
+          {/* 5 KPI Metric Cards */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3.5">
+            {/* 1. Total Employees */}
+            <div className="bg-white p-4 rounded-xl border border-gray-200/80 shadow-xs flex items-center justify-between hover:border-gray-300 transition-all">
+              <div>
+                <p className="text-[12px] font-medium text-gray-500">Total Employees</p>
+                <div className="flex items-baseline gap-2 mt-1">
+                  <span className="text-2xl font-bold text-gray-900 tracking-tight">{totalCount}</span>
+                  <span className="text-[11px] font-medium text-emerald-600 flex items-center">
+                    ↑ 12%
+                  </span>
+                </div>
+                <p className="text-[10px] text-gray-400 mt-0.5">vs last month</p>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 border border-purple-100/60 shrink-0">
+                <Users className="w-5 h-5" />
+              </div>
+            </div>
 
-        {/* Filters & Actions Bar */}
-        <div className="bg-white p-4 border border-gray-200 rounded-2xl shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="relative flex-1 w-full max-w-md">
-            <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Search by name, code, email, phone..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs border border-gray-200 rounded-xl bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            />
+            {/* 2. Active */}
+            <div className="bg-white p-4 rounded-xl border border-gray-200/80 shadow-xs flex items-center justify-between hover:border-gray-300 transition-all">
+              <div>
+                <p className="text-[12px] font-medium text-gray-500">Active</p>
+                <div className="flex items-baseline gap-2 mt-1">
+                  <span className="text-2xl font-bold text-gray-900 tracking-tight">{activeCount}</span>
+                  <span className="text-[11px] font-medium text-emerald-600 flex items-center">
+                    ↑ 4%
+                  </span>
+                </div>
+                <p className="text-[10px] text-gray-400 mt-0.5">Currently working</p>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 border border-emerald-100/60 shrink-0">
+                <UserCheck className="w-5 h-5" />
+              </div>
+            </div>
+
+            {/* 3. Inactive / Blocked */}
+            <div className="bg-white p-4 rounded-xl border border-gray-200/80 shadow-xs flex items-center justify-between hover:border-gray-300 transition-all">
+              <div>
+                <p className="text-[12px] font-medium text-gray-500">Inactive / Blocked</p>
+                <div className="flex items-baseline gap-2 mt-1">
+                  <span className="text-2xl font-bold text-gray-900 tracking-tight">{inactiveCount}</span>
+                  <span className="text-[11px] font-medium text-gray-400">
+                    0%
+                  </span>
+                </div>
+                <p className="text-[10px] text-gray-400 mt-0.5">Suspended / exited</p>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 border border-blue-100/60 shrink-0">
+                <UserX className="w-5 h-5" />
+              </div>
+            </div>
+
+            {/* 4. Onboarding In Progress */}
+            <div className="bg-white p-4 rounded-xl border border-gray-200/80 shadow-xs flex items-center justify-between hover:border-gray-300 transition-all">
+              <div>
+                <p className="text-[12px] font-medium text-gray-500">Onboarding In Progress</p>
+                <div className="flex items-baseline gap-2 mt-1">
+                  <span className="text-2xl font-bold text-gray-900 tracking-tight">{pendingOnboarding}</span>
+                  <span className="text-[11px] font-medium text-amber-600">
+                    Pending
+                  </span>
+                </div>
+                <p className="text-[10px] text-gray-400 mt-0.5">Docs incomplete</p>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 border border-amber-100/60 shrink-0">
+                <Clock className="w-5 h-5" />
+              </div>
+            </div>
+
+            {/* 5. Departments */}
+            <div className="bg-white p-4 rounded-xl border border-gray-200/80 shadow-xs flex items-center justify-between hover:border-gray-300 transition-all">
+              <div>
+                <p className="text-[12px] font-medium text-gray-500">Departments</p>
+                <div className="flex items-baseline gap-2 mt-1">
+                  <span className="text-2xl font-bold text-gray-900 tracking-tight">{departmentCount}</span>
+                  <span className="text-[11px] font-medium text-gray-400">
+                    Units
+                  </span>
+                </div>
+                <p className="text-[10px] text-gray-400 mt-0.5">Active organizational</p>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-red-500 border border-red-100/60 shrink-0">
+                <Building2 className="w-5 h-5" />
+              </div>
+            </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
-            <div className="w-44">
-              <Select
-                value={deptFilter}
-                onChange={(e) => setDeptFilter(e.target.value)}
-                size="sm"
-                options={[
-                  { value: 'all', label: 'All Departments' },
-                  ...departmentOptions.map((d) => ({ value: d, label: d })),
-                ]}
+          {/* Clean Single-Row Filter & Action Toolbar */}
+          <div className="bg-white p-2.5 px-3.5 rounded-2xl border border-gray-200/80 shadow-xs flex items-center justify-between gap-3 overflow-x-auto">
+            {/* Search Input */}
+            <div className="relative w-72 shrink-0">
+              <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                placeholder="Search by name, code, email, phone..."
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="w-full h-[38px] pl-10 pr-3.5 text-xs border border-gray-200 rounded-full bg-gray-50/60 hover:bg-white focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-hidden text-gray-800 placeholder-gray-400"
               />
             </div>
 
-            <div className="w-36">
-              <Select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                size="sm"
-                options={[
-                  { value: 'all', label: 'All Statuses' },
-                  { value: 'active', label: 'Active' },
-                  { value: 'inactive', label: 'Inactive' },
-                  { value: 'terminated', label: 'Terminated (Exit)' },
-                ]}
-              />
-            </div>
-
-            {roleOptions.length > 0 && (
-              <div className="w-48">
+            {/* Dropdowns & Actions */}
+            <div className="flex items-center gap-2 shrink-0">
+              <div className="w-44 shrink-0">
                 <Select
-                  value={roleFilter}
-                  onChange={(e) => setRoleFilter(e.target.value)}
+                  value={deptFilter}
+                  onChange={(e) => {
+                    setDeptFilter(e.target.value);
+                    setCurrentPage(1);
+                  }}
                   size="sm"
+                  triggerClassName="rounded-full h-[38px] min-h-[38px] text-xs font-medium border-gray-200 bg-white hover:bg-gray-50/80"
                   options={[
-                    { value: 'all', label: 'All Roles' },
-                    ...roleOptions.map((r) => ({
-                      value: r,
-                      label: `Role: ${r.replace(/_/g, ' ').toUpperCase()}`,
-                    })),
+                    { value: 'all', label: 'All Departments' },
+                    ...departmentOptions.map((d) => ({ value: d, label: d })),
                   ]}
                 />
               </div>
-            )}
 
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={fetchEmployees}
-              className="text-xs"
-              title="Refresh"
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-            </Button>
+              <div className="w-36 shrink-0">
+                <Select
+                  value={statusFilter}
+                  onChange={(e) => {
+                    setStatusFilter(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  size="sm"
+                  triggerClassName="rounded-full h-[38px] min-h-[38px] text-xs font-medium border-gray-200 bg-white hover:bg-gray-50/80"
+                  options={[
+                    { value: 'all', label: 'All Statuses' },
+                    { value: 'active', label: 'Active' },
+                    { value: 'inactive', label: 'Inactive' },
+                    { value: 'terminated', label: 'Terminated (Exit)' },
+                  ]}
+                />
+              </div>
 
-            <Link href="/hr/document-center">
-              <Button variant="secondary" size="sm" className="flex items-center gap-1.5 text-xs text-purple-700">
-                <FileText className="w-3.5 h-3.5" /> Document Center
-              </Button>
-            </Link>
+              {roleOptions.length > 0 && (
+                <div className="w-40 shrink-0">
+                  <Select
+                    value={roleFilter}
+                    onChange={(e) => {
+                      setRoleFilter(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                    size="sm"
+                    triggerClassName="rounded-full h-[38px] min-h-[38px] text-xs font-medium border-gray-200 bg-white hover:bg-gray-50/80"
+                    options={[
+                      { value: 'all', label: 'All Roles' },
+                      ...roleOptions.map((r) => ({
+                        value: r,
+                        label: r.replace(/_/g, ' ').toUpperCase(),
+                      })),
+                    ]}
+                  />
+                </div>
+              )}
 
-            {canManage && (
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={() => setCreateModal(true)}
-                className="flex items-center gap-1.5 text-xs bg-blue-600 hover:bg-blue-700"
+              {/* Refresh Icon Button */}
+              <button
+                type="button"
+                onClick={fetchEmployees}
+                title="Refresh Table"
+                className="h-[38px] w-[38px] shrink-0 flex items-center justify-center rounded-full border border-gray-200 bg-white hover:bg-gray-50 active:scale-95 text-gray-600 transition-all shadow-2xs"
               >
-                <Plus className="w-3.5 h-3.5" /> Add Employee
-              </Button>
-            )}
-          </div>
-        </div>
+                <RefreshCw className="w-3.5 h-3.5" />
+              </button>
 
-        {/* Directory Table */}
-        {loading ? (
-          <div className="p-16 flex justify-center">
-            <PageLoader />
-          </div>
-        ) : filteredEmployees.length === 0 ? (
-          <EmptyState
-            title="No Employees Found"
-            description="Try adjusting your filter or search query."
-          />
-        ) : (
-          <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-gray-50/80 text-gray-600 font-bold border-b border-gray-200">
-                  <tr>
-                    <th className="p-3.5">Employee Name</th>
-                    <th className="p-3.5">Employee Code</th>
-                    <th className="p-3.5">Role</th>
-                    <th className="p-3.5">Department & Title</th>
-                    <th className="p-3.5">Reporting Manager</th>
-                    <th className="p-3.5">Joining Date</th>
-                    <th className="p-3.5">Status</th>
-                    <th className="p-3.5 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {filteredEmployees.map((emp) => (
-                    <tr key={emp.id} className="hover:bg-gray-50/60 transition-colors">
-                      <td className="p-3.5">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">
-                            {(emp.first_name?.[0] || 'E')}{(emp.last_name?.[0] || '')}
-                          </div>
-                          <div>
-                            <p className="font-bold text-gray-900">
-                              {emp.first_name} {emp.last_name}
-                            </p>
-                            <p className="text-[11px] text-gray-400">{emp.email || emp.phone || '—'}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="p-3.5 font-mono text-gray-600 text-[11px]">{emp.employee_code || '—'}</td>
-                      <td className="p-3.5">
-                        <span className="px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-100 text-[10px] uppercase font-bold tracking-wide">
-                          {emp.linkedUser?.role || 'employee'}
-                        </span>
-                      </td>
-                      <td className="p-3.5">
-                        <div className="font-semibold text-gray-900">{emp.designation || 'Staff'}</div>
-                        <span className="text-[10px] text-gray-400 flex items-center gap-1">
-                          <Building2 className="w-3 h-3" /> {emp.department || 'General'}
-                        </span>
-                      </td>
-                      <td className="p-3.5 text-gray-600">{emp.reporting_manager || 'None'}</td>
-                      <td className="p-3.5 text-gray-500">
-                        {emp.date_of_joining ? fmtDate(emp.date_of_joining) : '—'}
-                      </td>
-                      <td className="p-3.5">
-                        <span
-                          className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${
-                            STATUS_PILLS[emp.status] || 'bg-gray-100 text-gray-700 border-gray-200'
-                          }`}
-                        >
-                          {emp.status}
-                        </span>
-                      </td>
-                      <td className="p-3.5 text-right whitespace-nowrap">
-                        <div className="flex items-center justify-end gap-1.5">
-                          <Link href={`/employees/${emp.id}`}>
-                            <Button variant="secondary" size="sm" className="text-xs">
-                              View Profile <ChevronRight className="w-3 h-3 ml-1" />
-                            </Button>
-                          </Link>
-                          {isSuperAdmin && (
-                            <Button
-                              variant="danger"
-                              size="sm"
-                              className="text-xs px-2.5 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200"
-                              title="Delete Employee (Super Admin Only)"
-                              onClick={() => setDeleteTarget(emp)}
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </Button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              {/* Document Center Button */}
+              <Link href="/hr/document-center" className="shrink-0">
+                <button
+                  type="button"
+                  className="h-[38px] px-3.5 rounded-full border border-purple-200 bg-purple-50/70 hover:bg-purple-100 text-purple-700 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-2xs active:scale-[0.98] whitespace-nowrap"
+                >
+                  <FileText className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                  Document Center
+                </button>
+              </Link>
+
+              {/* Add Employee Button */}
+              {canManage && (
+                <button
+                  type="button"
+                  onClick={() => setCreateModal(true)}
+                  className="h-[38px] px-4 rounded-full bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-all shrink-0 whitespace-nowrap"
+                >
+                  <Plus className="w-4 h-4 shrink-0 stroke-[2.5]" />
+                  Add Employee
+                </button>
+              )}
             </div>
           </div>
-        )}
+
+          {/* Directory SaaS Table */}
+          {loading ? (
+            <div className="bg-white border border-gray-200/80 rounded-xl p-16 flex justify-center shadow-xs">
+              <PageLoader />
+            </div>
+          ) : filteredEmployees.length === 0 ? (
+            <div className="bg-white border border-gray-200/80 rounded-xl p-8 shadow-xs">
+              <EmptyState
+                title="No Employees Found"
+                description="Try adjusting your filter or search query."
+              />
+            </div>
+          ) : (
+            <div className="bg-white border border-gray-200/80 rounded-xl shadow-xs overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead className="bg-[#f8fafc] text-gray-500 font-semibold border-b border-gray-200/80 uppercase text-[11px] tracking-wider">
+                    <tr>
+                      <th className="py-3 px-3.5 w-10 text-center">
+                        <input
+                          type="checkbox"
+                          checked={isAllSelected}
+                          onChange={toggleSelectAll}
+                          className="w-3.5 h-3.5 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                        />
+                      </th>
+                      <th className="py-3 px-3.5">Employee Name</th>
+                      <th className="py-3 px-3.5">Employee Code</th>
+                      <th className="py-3 px-3.5">Role</th>
+                      <th className="py-3 px-3.5">Department & Title</th>
+                      <th className="py-3 px-3.5">Reporting Manager</th>
+                      <th className="py-3 px-3.5">Joining Date</th>
+                      <th className="py-3 px-3.5">Status</th>
+                      <th className="py-3 px-3.5 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {paginatedEmployees.map((emp) => {
+                      const fullName = `${emp.first_name || ''} ${emp.last_name || ''}`.trim() || 'Employee';
+                      const initials = `${(emp.first_name?.[0] || 'E')}${(emp.last_name?.[0] || '')}`.toUpperCase();
+                      const avatar = getAvatarStyle(fullName);
+                      const isSelected = Boolean(selectedIds[emp.id]);
+                      const roleLabel = (emp.linkedUser?.role || 'employee').replace(/_/g, ' ').toUpperCase();
+
+                      return (
+                        <tr
+                          key={emp.id}
+                          className={`hover:bg-blue-50/30 transition-colors ${isSelected ? 'bg-blue-50/40' : ''}`}
+                        >
+                          {/* Checkbox */}
+                          <td className="py-3 px-3.5 text-center">
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={() => toggleSelectOne(emp.id)}
+                              className="w-3.5 h-3.5 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                            />
+                          </td>
+
+                          {/* Employee Name + Avatar */}
+                          <td className="py-3 px-3.5">
+                            <div className="flex items-center gap-3">
+                              <div
+                                className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs tracking-wider border shrink-0 transition-transform ${avatar.bg} ${avatar.text} ${avatar.border}`}
+                              >
+                                {initials}
+                              </div>
+                              <div>
+                                <Link
+                                  href={`/employees/${emp.id}`}
+                                  className="font-semibold text-gray-900 hover:text-blue-600 transition-colors block leading-tight"
+                                >
+                                  {fullName}
+                                </Link>
+                                <p className="text-[11px] text-gray-400 font-normal mt-0.5 leading-tight">
+                                  {emp.email || emp.phone || 'No contact email'}
+                                </p>
+                              </div>
+                            </div>
+                          </td>
+
+                          {/* Employee Code */}
+                          <td className="py-3 px-3.5">
+                            <span className="font-mono text-gray-600 text-[11px] font-medium bg-gray-50 px-2 py-0.5 rounded border border-gray-100">
+                              {emp.employee_code || '—'}
+                            </span>
+                          </td>
+
+                          {/* Role Badge */}
+                          <td className="py-3 px-3.5">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-blue-50/80 text-blue-700 border border-blue-100/70 text-[10px] font-semibold tracking-wide uppercase">
+                              {roleLabel}
+                            </span>
+                          </td>
+
+                          {/* Department & Designation */}
+                          <td className="py-3 px-3.5">
+                            <div className="font-semibold text-gray-900">
+                              {emp.designation || 'Staff'}
+                            </div>
+                            <div className="text-[11px] text-gray-400 flex items-center gap-1 mt-0.5">
+                              <Building2 className="w-3 h-3 text-gray-400 shrink-0" />
+                              <span>{emp.department || 'General'}</span>
+                            </div>
+                          </td>
+
+                          {/* Reporting Manager */}
+                          <td className="py-3 px-3.5 text-gray-600">
+                            {emp.reporting_manager || 'None'}
+                          </td>
+
+                          {/* Joining Date */}
+                          <td className="py-3 px-3.5 text-gray-500 font-medium">
+                            {emp.date_of_joining ? fmtDate(emp.date_of_joining) : '—'}
+                          </td>
+
+                          {/* Status */}
+                          <td className="py-3 px-3.5">
+                            {emp.status === 'active' ? (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                Active
+                              </span>
+                            ) : emp.status === 'terminated' ? (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-red-50 text-red-700 border border-red-200">
+                                <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                                Terminated
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-gray-100 text-gray-600 border border-gray-200">
+                                <span className="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
+                                Inactive
+                              </span>
+                            )}
+                          </td>
+
+                          {/* Actions */}
+                          <td className="py-3 px-3.5 text-right whitespace-nowrap">
+                            <div className="flex items-center justify-end gap-1.5">
+                              <Link href={`/employees/${emp.id}`}>
+                                <button
+                                  type="button"
+                                  className="h-7 px-2.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs font-medium inline-flex items-center gap-1 transition-colors"
+                                >
+                                  View Profile
+                                  <ChevronRight className="w-3 h-3 text-gray-400" />
+                                </button>
+                              </Link>
+
+                              {isSuperAdmin && (
+                                <button
+                                  type="button"
+                                  title="Delete Employee"
+                                  onClick={() => setDeleteTarget(emp)}
+                                  className="h-7 w-7 rounded-lg border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Bottom Pagination Bar */}
+              <div className="py-3 px-4 bg-white border-t border-gray-200/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-600">
+                <div>
+                  Showing{' '}
+                  <span className="font-semibold text-gray-900">
+                    {filteredEmployees.length === 0 ? 0 : (currentPage - 1) * pageSize + 1}
+                  </span>{' '}
+                  to{' '}
+                  <span className="font-semibold text-gray-900">
+                    {Math.min(currentPage * pageSize, filteredEmployees.length)}
+                  </span>{' '}
+                  of{' '}
+                  <span className="font-semibold text-gray-900">{filteredEmployees.length}</span> employees
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      disabled={currentPage <= 1}
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      className="p-1 rounded-md border border-gray-200 bg-white hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed text-gray-600"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                      <button
+                        key={page}
+                        type="button"
+                        onClick={() => setCurrentPage(page)}
+                        className={`min-w-7 h-7 px-2 text-xs font-semibold rounded-md border transition-colors ${
+                          currentPage === page
+                            ? 'bg-blue-600 text-white border-blue-600'
+                            : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    ))}
+
+                    <button
+                      type="button"
+                      disabled={currentPage >= totalPages}
+                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                      className="p-1 rounded-md border border-gray-200 bg-white hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed text-gray-600"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="w-28">
+                    <Select
+                      value={String(pageSize)}
+                      onChange={(e) => {
+                        setPageSize(Number(e.target.value));
+                        setCurrentPage(1);
+                      }}
+                      size="sm"
+                      options={[
+                        { value: '5', label: '5 per page' },
+                        { value: '10', label: '10 per page' },
+                        { value: '25', label: '25 per page' },
+                        { value: '50', label: '50 per page' },
+                      ]}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
         </div>
       </main>
 

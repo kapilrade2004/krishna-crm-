@@ -59,10 +59,10 @@ export default function TaskItemCard({
   return (
     <div
       onClick={() => onSelect(item)}
-      className={`group bg-[#FFFDF7] rounded-2xl border p-4 transition-all duration-200 cursor-pointer flex flex-col justify-between space-y-3 ${
+      className={`group bg-[#FFFDF7] rounded-[20px] border p-5 transition-all duration-180 cursor-pointer flex flex-col justify-between space-y-3 ${
         isDone
-          ? 'border-slate-200/50 opacity-80'
-          : 'border-slate-200/80 hover:border-amber/60 hover:shadow-sm'
+          ? 'border-[#E7E5DE]/60 opacity-80'
+          : 'border-[#E7E5DE] hover:border-slate-300 hover:shadow-xs hover:bg-[#F7F6F2]'
       }`}
     >
       {/* Top Header: Badge, Priority & Overdue */}

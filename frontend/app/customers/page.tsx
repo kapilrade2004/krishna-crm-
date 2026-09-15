@@ -407,74 +407,103 @@ export default function CustomersPage() {
               ══════════════════════════════════════════════════════════════ */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
             {/* 1. Total Customers */}
-            <div className="bg-purple-50/40 border border-purple-100/90 rounded-2xl p-4 shadow-2xs flex flex-col justify-between">
-              <div className="w-9 h-9 rounded-xl bg-purple-100/70 text-purple-600 flex items-center justify-center mb-2.5">
-                <Users size={18} strokeWidth={2.2} />
+            <div className="bg-white border border-gray-200/90 rounded-2xl p-4 shadow-2xs hover:shadow-sm hover:border-gray-300 transition-all">
+              <div className="flex items-center justify-between text-gray-500 mb-2">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-gray-500">TOTAL</span>
+                <span className="text-[10px] font-bold text-gray-400">Directory 👥</span>
               </div>
-              <div>
-                <p className="text-xs font-medium text-slate-500 leading-tight">Total Customers</p>
-                <p className="text-2xl font-black text-slate-900 leading-tight my-1">{totalCustomersCount}</p>
-                <p className="text-xs font-semibold text-emerald-600 flex items-center gap-0.5">
-                  <span>↑</span> 12% <span className="font-normal text-slate-400">vs last month</span>
-                </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 shrink-0">
+                  <Users size={18} />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-2xl font-bold font-mono text-gray-900 tracking-tight leading-none">
+                    {totalCustomersCount}
+                  </h3>
+                  <p className="text-xs text-gray-500 mt-1 font-medium leading-none">Total Customers</p>
+                </div>
               </div>
             </div>
 
             {/* 2. Active */}
-            <div className="bg-emerald-50/40 border border-emerald-100/90 rounded-2xl p-4 shadow-2xs flex flex-col justify-between">
-              <div className="w-9 h-9 rounded-xl bg-emerald-100/70 text-emerald-600 flex items-center justify-center mb-2.5">
-                <UserCheck size={18} strokeWidth={2.2} />
+            <div className="bg-white border border-gray-200/90 rounded-2xl p-4 shadow-2xs hover:shadow-sm hover:border-gray-300 transition-all">
+              <div className="flex items-center justify-between text-gray-500 mb-2">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-gray-500">ACTIVE</span>
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  Engaged 🟢
+                </span>
               </div>
-              <div>
-                <p className="text-xs font-medium text-slate-500 leading-tight">Active</p>
-                <p className="text-2xl font-black text-slate-900 leading-tight my-1">{activeCustomersCount}</p>
-                <p className="text-xs font-semibold text-emerald-600 flex items-center gap-0.5">
-                  <span>↑</span> 8% <span className="font-normal text-slate-400">vs last month</span>
-                </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
+                  <UserCheck size={18} />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-2xl font-bold font-mono text-gray-900 tracking-tight leading-none">
+                    {activeCustomersCount}
+                  </h3>
+                  <p className="text-xs text-gray-500 mt-1 font-medium leading-none">Active Accounts</p>
+                </div>
               </div>
             </div>
 
             {/* 3. Inactive / Blocked */}
-            <div className="bg-slate-50/70 border border-slate-200/80 rounded-2xl p-4 shadow-2xs flex flex-col justify-between">
-              <div className="w-9 h-9 rounded-xl bg-slate-100 text-slate-500 flex items-center justify-center mb-2.5">
-                <UserX size={18} strokeWidth={2.2} />
+            <div className="bg-white border border-gray-200/90 rounded-2xl p-4 shadow-2xs hover:shadow-sm hover:border-gray-300 transition-all">
+              <div className="flex items-center justify-between text-gray-500 mb-2">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-gray-500">INACTIVE</span>
+                <span className="text-[10px] font-bold text-gray-400">Suspended</span>
               </div>
-              <div>
-                <p className="text-xs font-medium text-slate-500 leading-tight">Inactive / Blocked</p>
-                <p className="text-2xl font-black text-slate-900 leading-tight my-1">{inactiveCustomersCount}</p>
-                <p className="text-xs font-medium text-slate-400 flex items-center gap-0.5">
-                  <span>→</span> 0% <span className="font-normal">vs last month</span>
-                </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500 shrink-0">
+                  <UserX size={18} />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-2xl font-bold font-mono text-gray-900 tracking-tight leading-none">
+                    {inactiveCustomersCount}
+                  </h3>
+                  <p className="text-xs text-gray-500 mt-1 font-medium leading-none">Inactive / Blocked</p>
+                </div>
               </div>
             </div>
 
             {/* 4. Total Revenue */}
-            <div className="bg-blue-50/40 border border-blue-100/90 rounded-2xl p-4 shadow-2xs flex flex-col justify-between">
-              <div className="w-9 h-9 rounded-xl bg-blue-100/70 text-blue-600 flex items-center justify-center mb-2.5">
-                <IndianRupee size={18} strokeWidth={2.2} />
+            <div className="bg-white border border-gray-200/90 rounded-2xl p-4 shadow-2xs hover:shadow-sm hover:border-gray-300 transition-all">
+              <div className="flex items-center justify-between text-gray-500 mb-2">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-gray-500">REVENUE</span>
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                  Fulfilled 💰
+                </span>
               </div>
-              <div>
-                <p className="text-xs font-medium text-slate-500 leading-tight">Total Revenue</p>
-                <p className="text-2xl font-black text-slate-900 leading-tight my-1">
-                  ₹{totalRevenueAmount.toLocaleString('en-IN')}
-                </p>
-                <p className="text-xs font-semibold text-emerald-600 flex items-center gap-0.5">
-                  <span>↑</span> 0% <span className="font-normal text-slate-400">vs last month</span>
-                </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shrink-0">
+                  <IndianRupee size={18} />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-2xl font-bold font-mono text-gray-900 tracking-tight leading-none">
+                    ₹{totalRevenueAmount.toLocaleString('en-IN')}
+                  </h3>
+                  <p className="text-xs text-gray-500 mt-1 font-medium leading-none">Total Sales Volume</p>
+                </div>
               </div>
             </div>
 
             {/* 5. Unassigned */}
-            <div className="bg-rose-50/40 border border-rose-100/90 rounded-2xl p-4 shadow-2xs flex flex-col justify-between">
-              <div className="w-9 h-9 rounded-xl bg-rose-100/70 text-rose-600 flex items-center justify-center mb-2.5">
-                <AlertTriangle size={18} strokeWidth={2.2} />
+            <div className="bg-white border border-gray-200/90 rounded-2xl p-4 shadow-2xs hover:shadow-sm hover:border-gray-300 transition-all">
+              <div className="flex items-center justify-between text-gray-500 mb-2">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-gray-500">UNASSIGNED</span>
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200">
+                  Needs Staff ⚠️
+                </span>
               </div>
-              <div>
-                <p className="text-xs font-medium text-slate-500 leading-tight">Unassigned</p>
-                <p className="text-2xl font-black text-slate-900 leading-tight my-1">{unassignedCustomersCount}</p>
-                <p className="text-xs font-semibold text-rose-600 flex items-center gap-0.5">
-                  <span>↓</span> 0% <span className="font-normal text-slate-400">vs last month</span>
-                </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 shrink-0">
+                  <AlertTriangle size={18} />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-2xl font-bold font-mono text-gray-900 tracking-tight leading-none">
+                    {unassignedCustomersCount}
+                  </h3>
+                  <p className="text-xs text-gray-500 mt-1 font-medium leading-none">Pending Rep Assignment</p>
+                </div>
               </div>
             </div>
           </div>

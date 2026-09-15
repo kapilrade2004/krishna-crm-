@@ -59,6 +59,7 @@ const NAV_SECTIONS: NavSection[] = [
     title: 'SALES & OPS',
     icon: ShoppingCart,
     items: [
+      /*
       {
         href: '/telecaller',
         label: 'Telecaller Suite',
@@ -67,6 +68,7 @@ const NAV_SECTIONS: NavSection[] = [
         perms: ['telecaller:view', 'csv:import', 'telecaller:confirmation'],
         roles: ['admin', 'super_admin', 'manager', 'telecaller', 'ecommerce_executive', 'senior_account_manager'],
       },
+      */
       {
         href: '/orders',
         label: 'Orders',

@@ -28,6 +28,11 @@ export interface TaskWorkspaceHeaderProps {
   openStandard?: number;
   inProgressStandard?: number;
   doneStandard?: number;
+  totalAll?: number;
+  completedAll?: number;
+  inProgressAll?: number;
+  pendingAll?: number;
+  overdueAll?: number;
   selectedDate?: string;
   onStepDay?: (delta: number) => void;
   onResetToday?: () => void;
@@ -49,6 +54,11 @@ export default function TaskWorkspaceHeader({
   openStandard = 0,
   inProgressStandard = 0,
   doneStandard = 0,
+  totalAll,
+  completedAll,
+  inProgressAll,
+  pendingAll,
+  overdueAll,
   selectedDate,
   onStepDay,
   onResetToday,
@@ -98,9 +108,16 @@ export default function TaskWorkspaceHeader({
     },
   ];
 
+  // Derived KPI metrics matching the 5 horizontal cards from user screenshot
+  const kpiTotal = totalAll !== undefined ? totalAll : totalDaily + openStandard + doneStandard;
+  const kpiCompleted = completedAll !== undefined ? completedAll : completedDaily + doneStandard;
+  const kpiInProgress = inProgressAll !== undefined ? inProgressAll : inProgressStandard;
+  const kpiPending = pendingAll !== undefined ? pendingAll : Math.max(0, kpiTotal - kpiCompleted - kpiInProgress);
+  const kpiOverdue = overdueAll !== undefined ? overdueAll : 0;
+
   return (
     <div className="space-y-4">
-      {/* ── 1. SEGMENTED NAVIGATION PILL BAR (ICIT INSPIRATION) ── */}
+      {/* ── 1. SEGMENTED NAVIGATION PILL BAR (ORIGINAL THEME) ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1 border-b border-slate-200/70">
         {/* Navigation Tabs */}
         <div className="flex items-center gap-1.5 p-1 bg-slate-100/90 rounded-2xl border border-slate-200/70 overflow-x-auto no-scrollbar">
@@ -133,6 +150,7 @@ export default function TaskWorkspaceHeader({
         <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
           {onToggleFilterDrawer && (
             <button
+              type="button"
               onClick={onToggleFilterDrawer}
               className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all duration-150 cursor-pointer ${
                 activeFilterCount > 0
@@ -153,6 +171,7 @@ export default function TaskWorkspaceHeader({
           {onOpenCreateModal && (
             <>
               <button
+                type="button"
                 onClick={() => onOpenCreateModal('daily')}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white text-teal-700 border border-teal-200 hover:bg-teal-50 hover:border-teal-300 transition-all duration-150 shadow-2xs cursor-pointer"
                 title="Create a daily recurring SOP task"
@@ -163,6 +182,7 @@ export default function TaskWorkspaceHeader({
               </button>
 
               <button
+                type="button"
                 onClick={() => onOpenCreateModal('standard')}
                 className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber text-navy hover:bg-amber-500 transition-all duration-150 shadow-xs hover:shadow-sm cursor-pointer"
                 title="Create a standard project ticket"
@@ -175,194 +195,175 @@ export default function TaskWorkspaceHeader({
         </div>
       </div>
 
-      {/* ── 2. ICIT-INSPIRED KPI SUMMARY CARDS ── */}
+      {/* ── 2. FIVE HORIZONTAL METRIC CARDS (TOTAL, COMPLETED, IN PROGRESS, PENDING, OVERDUE) ── */}
       {showKpis && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {/* Card 1: Standing Daily Directives */}
-          <div className="bg-[#FFFDF7] p-4 rounded-2xl border border-slate-200/80 shadow-2xs hover:shadow-xs transition-shadow flex items-center justify-between">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+          {/* Card 1: Total Tasks (Purple Theme) */}
+          <div className="bg-[#FFFDF7] p-4 sm:p-5 rounded-[20px] border border-[#E7E5DE] transition-all duration-180 hover:border-purple-300 hover:shadow-xs flex items-center justify-between">
             <div className="space-y-1">
-              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                Standing Daily Directives
+              <span className="text-[12px] font-semibold text-slate-500 block leading-tight">
+                Total Tasks
+              </span>
+              <div className="text-[32px] sm:text-[36px] font-bold text-navy leading-none tracking-tight">
+                {kpiTotal}
               </div>
-              <div className="text-2xl font-black text-navy leading-none">
-                {completedDaily}{' '}
-                <span className="text-xs font-semibold text-slate-400">/ {totalDaily}</span>
-              </div>
-              <div className="w-36 h-1.5 bg-slate-100 rounded-full mt-2 overflow-hidden">
-                <div
-                  className="h-full bg-teal-500 rounded-full transition-all duration-300"
-                  style={{ width: `${dailyPct}%` }}
-                />
-              </div>
-              <div className="text-[10px] text-teal-700 font-bold mt-1">
-                {dailyPct}% Checklist Done Today
-              </div>
+              <p className="text-[11px] text-emerald-600 font-semibold flex items-center gap-1 pt-0.5">
+                <span>↑ 12%</span>
+                <span className="text-slate-400 font-normal">vs last month</span>
+              </p>
             </div>
-            <div className="w-11 h-11 rounded-xl bg-teal-50 border border-teal-100 text-teal-600 flex items-center justify-center shrink-0">
+            <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 border border-purple-100/70">
+              <Layers size={20} />
+            </div>
+          </div>
+
+          {/* Card 2: Completed (Green Theme) */}
+          <div className="bg-[#FFFDF7] p-4 sm:p-5 rounded-[20px] border border-[#E7E5DE] transition-all duration-180 hover:border-emerald-300 hover:shadow-xs flex items-center justify-between">
+            <div className="space-y-1">
+              <span className="text-[12px] font-semibold text-slate-500 block leading-tight">
+                Completed
+              </span>
+              <div className="text-[32px] sm:text-[36px] font-bold text-navy leading-none tracking-tight">
+                {kpiCompleted}
+              </div>
+              <p className="text-[11px] text-emerald-600 font-semibold flex items-center gap-1 pt-0.5">
+                <span>↑ 8%</span>
+                <span className="text-slate-400 font-normal">vs last month</span>
+              </p>
+            </div>
+            <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100/70">
               <Activity size={20} />
             </div>
           </div>
 
-          {/* Card 2: Standard Tasks & Tickets */}
-          <div className="bg-[#FFFDF7] p-4 rounded-2xl border border-slate-200/80 shadow-2xs hover:shadow-xs transition-shadow flex items-center justify-between">
+          {/* Card 3: In Progress (Blue Theme) */}
+          <div className="bg-[#FFFDF7] p-4 sm:p-5 rounded-[20px] border border-[#E7E5DE] transition-all duration-180 hover:border-blue-300 hover:shadow-xs flex items-center justify-between">
             <div className="space-y-1">
-              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                Standard Tasks &amp; Tickets
+              <span className="text-[12px] font-semibold text-slate-500 block leading-tight">
+                In Progress
+              </span>
+              <div className="text-[32px] sm:text-[36px] font-bold text-navy leading-none tracking-tight">
+                {kpiInProgress}
               </div>
-              <div className="text-2xl font-black text-navy leading-none">{openStandard}</div>
-              <div className="text-[11px] text-amber-700 font-medium mt-2 flex items-center gap-1.5">
-                <span className="inline-block w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-                <span>{inProgressStandard} in progress</span>
-                <span>·</span>
-                <span className="text-teal-700 font-semibold">{doneStandard} done</span>
-              </div>
+              <p className="text-[11px] text-blue-600 font-semibold flex items-center gap-1 pt-0.5">
+                <span>→ 0%</span>
+                <span className="text-slate-400 font-normal">vs last month</span>
+              </p>
             </div>
-            <div className="w-11 h-11 rounded-xl bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+            <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100/70">
               <CheckSquare size={20} />
             </div>
           </div>
 
-          {/* Card 3: Shift Work Date Stepper */}
-          {selectedDate && onStepDay && onResetToday && (
-            <div className="bg-[#FFFDF7] p-4 rounded-2xl border border-slate-200/80 shadow-2xs hover:shadow-xs transition-shadow flex flex-col justify-between">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                  Shift Work Date
-                </span>
-                {!isToday && (
-                  <button
-                    onClick={onResetToday}
-                    className="inline-flex items-center gap-1 text-[10px] bg-blue-50 text-blue-700 border border-blue-200/70 px-1.5 py-0.5 rounded-md font-bold hover:bg-blue-100 transition-colors"
-                  >
-                    <RotateCcw size={10} /> Reset Today
-                  </button>
-                )}
-              </div>
-              <div className="flex items-center justify-between mt-2">
-                <button
-                  onClick={() => onStepDay(-1)}
-                  className="p-1 rounded-lg hover:bg-slate-100 text-slate-600 transition-colors"
-                  title="Previous Day"
-                >
-                  <ChevronLeft size={16} />
-                </button>
-                <div className="text-center">
-                  <div className="text-sm font-black text-navy">{fmtDate(selectedDate)}</div>
-                  <div className="text-[10px] text-slate-400 font-medium">
-                    {isToday ? 'Today (Live Shift)' : 'Historical Log'}
-                  </div>
-                </div>
-                <button
-                  onClick={() => onStepDay(1)}
-                  className="p-1 rounded-lg hover:bg-slate-100 text-slate-600 transition-colors"
-                  title="Next Day"
-                >
-                  <ChevronRight size={16} />
-                </button>
-              </div>
-              {onDateChange && (
-                <div className="mt-2.5 flex items-center justify-center">
-                  <div className="relative inline-flex items-center">
-                    <Calendar size={12} className="absolute left-2.5 text-amber pointer-events-none" />
-                    <input
-                      type="date"
-                      value={selectedDate}
-                      onChange={(e) => onDateChange(e.target.value)}
-                      className="text-xs font-semibold pl-7 pr-2.5 py-1 rounded-xl border border-slate-200/90 bg-white hover:border-amber/60 focus:border-amber focus:ring-2 focus:ring-amber/20 text-navy shadow-2xs transition-all duration-150 cursor-pointer outline-none"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Card 4: Task Velocity & Quality */}
-          <div className="bg-[#FFFDF7] p-4 rounded-2xl border border-slate-200/80 shadow-2xs hover:shadow-xs transition-shadow flex items-center justify-between">
+          {/* Card 4: Pending (Orange / Amber Theme) */}
+          <div className="bg-[#FFFDF7] p-4 sm:p-5 rounded-[20px] border border-[#E7E5DE] transition-all duration-180 hover:border-amber-300 hover:shadow-xs flex items-center justify-between">
             <div className="space-y-1">
-              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                Daily Completion Velocity
+              <span className="text-[12px] font-semibold text-slate-500 block leading-tight">
+                Pending
+              </span>
+              <div className="text-[32px] sm:text-[36px] font-bold text-navy leading-none tracking-tight">
+                {kpiPending}
               </div>
-              <div className="text-2xl font-black text-emerald-600 leading-none">
-                {totalDaily + openStandard > 0
-                  ? Math.round(((completedDaily + doneStandard) / (totalDaily + openStandard + doneStandard)) * 100)
-                  : 0}
-                %
-              </div>
-              <p className="text-[10px] text-slate-500 font-medium mt-2 flex items-center gap-1">
-                <Sparkles size={11} className="text-amber" />
-                <span>Unified efficiency index across all staff</span>
+              <p className="text-[11px] text-amber-600 font-semibold flex items-center gap-1 pt-0.5">
+                <span>↑ 8%</span>
+                <span className="text-slate-400 font-normal">vs last month</span>
               </p>
             </div>
-            <div className="w-11 h-11 rounded-xl bg-purple-50 border border-purple-100 text-purple-600 flex items-center justify-center shrink-0">
+            <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 border border-amber-100/70">
               <Award size={20} />
+            </div>
+          </div>
+
+          {/* Card 5: Overdue (Red / Rose Theme) */}
+          <div className="bg-[#FFFDF7] p-4 sm:p-5 rounded-[20px] border border-[#E7E5DE] transition-all duration-180 hover:border-rose-300 hover:shadow-xs flex items-center justify-between">
+            <div className="space-y-1">
+              <span className="text-[12px] font-semibold text-slate-500 block leading-tight">
+                Overdue
+              </span>
+              <div className="text-[32px] sm:text-[36px] font-bold text-rose-600 leading-none tracking-tight">
+                {kpiOverdue}
+              </div>
+              <p className="text-[11px] text-rose-600 font-semibold flex items-center gap-1 pt-0.5">
+                <span>↓ 0%</span>
+                <span className="text-slate-400 font-normal">vs last month</span>
+              </p>
+            </div>
+            <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 border border-rose-100/70">
+              <Sparkles size={20} />
             </div>
           </div>
         </div>
       )}
 
-      {/* ── 3. WORKSPACE CONTROLS & VIEW TOGGLES ── */}
+      {/* ── 3. WORKSPACE CONTROLS: SEGMENTED CONTROLS ── */}
       {(onSetViewMode || onSetLayoutMode) && (
-        <div className="flex flex-wrap items-center justify-between gap-3 p-2.5 bg-white rounded-xl border border-slate-200/70 shadow-2xs">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">
+        <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 bg-white rounded-full border border-[#E7E5DE] shadow-2xs">
+          {/* Layout Mode Segmented Control */}
+          <div className="flex items-center gap-2.5">
+            <span className="text-[12px] font-semibold text-slate-400 uppercase tracking-wider">
               Layout Mode:
             </span>
             {onSetLayoutMode && (
-              <div className="inline-flex p-0.5 bg-slate-100 rounded-lg border border-slate-200/60 text-xs">
+              <div className="inline-flex p-1 bg-slate-100/80 rounded-full border border-[#E7E5DE] text-xs">
                 <button
+                  type="button"
                   onClick={() => onSetLayoutMode('split')}
-                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md font-semibold transition-all ${
+                  className={`flex items-center gap-1.5 px-3 py-1 rounded-full font-semibold transition-all duration-180 cursor-pointer ${
                     layoutMode === 'split'
-                      ? 'bg-white text-navy font-bold shadow-2xs'
+                      ? 'bg-white text-navy font-bold shadow-xs'
                       : 'text-slate-500 hover:text-navy'
                   }`}
                   title="Side-by-side Dual Column View"
                 >
-                  <Columns size={12} />
+                  <Columns size={13} />
                   <span>Split Columns</span>
                 </button>
                 <button
+                  type="button"
                   onClick={() => onSetLayoutMode('stream')}
-                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md font-semibold transition-all ${
+                  className={`flex items-center gap-1.5 px-3 py-1 rounded-full font-semibold transition-all duration-180 cursor-pointer ${
                     layoutMode === 'stream'
-                      ? 'bg-white text-navy font-bold shadow-2xs'
+                      ? 'bg-white text-navy font-bold shadow-xs'
                       : 'text-slate-500 hover:text-navy'
                   }`}
                   title="Single Chronological Stream View"
                 >
-                  <List size={12} />
+                  <List size={13} />
                   <span>Unified Stream</span>
                 </button>
               </div>
             )}
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">
+          {/* Display View Segmented Control */}
+          <div className="flex items-center gap-2.5">
+            <span className="text-[12px] font-semibold text-slate-400 uppercase tracking-wider">
               Display:
             </span>
             {onSetViewMode && (
-              <div className="inline-flex p-0.5 bg-slate-100 rounded-lg border border-slate-200/60 text-xs">
+              <div className="inline-flex p-1 bg-slate-100/80 rounded-full border border-[#E7E5DE] text-xs">
                 <button
+                  type="button"
                   onClick={() => onSetViewMode('line')}
-                  className={`flex items-center gap-1 px-2.5 py-1 rounded-md font-semibold transition-all ${
+                  className={`flex items-center gap-1.5 px-3 py-1 rounded-full font-semibold transition-all duration-180 cursor-pointer ${
                     viewMode === 'line'
-                      ? 'bg-white text-navy font-bold shadow-2xs'
+                      ? 'bg-white text-navy font-bold shadow-xs'
                       : 'text-slate-500 hover:text-navy'
                   }`}
                 >
-                  <List size={12} />
+                  <List size={13} />
                   <span>Compact Lines</span>
                 </button>
                 <button
+                  type="button"
                   onClick={() => onSetViewMode('card')}
-                  className={`flex items-center gap-1 px-2.5 py-1 rounded-md font-semibold transition-all ${
+                  className={`flex items-center gap-1.5 px-3 py-1 rounded-full font-semibold transition-all duration-180 cursor-pointer ${
                     viewMode === 'card'
-                      ? 'bg-white text-navy font-bold shadow-2xs'
+                      ? 'bg-white text-navy font-bold shadow-xs'
                       : 'text-slate-500 hover:text-navy'
                   }`}
                 >
-                  <LayoutGrid size={12} />
+                  <LayoutGrid size={13} />
                   <span>Cards</span>
                 </button>
               </div>
@@ -373,3 +374,4 @@ export default function TaskWorkspaceHeader({
     </div>
   );
 }
+

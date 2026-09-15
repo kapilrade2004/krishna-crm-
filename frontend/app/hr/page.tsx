@@ -441,28 +441,25 @@ export default function HRWorkspacePage() {
         {!isSalaryWorkspace ? (
           <>
             {/* Command Bar Header */}
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 p-6 text-white shadow-xl">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
-                <div>
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-xs font-semibold text-amber border border-white/20 mb-2">
-                    <Cpu size={13} />
+            <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 px-5 py-3 text-white shadow-md">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 relative z-10">
+                <div className="shrink-0">
+                  <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-white/10 text-[10px] font-medium text-amber border border-white/15 mb-1">
+                    <Cpu size={11} />
                     BioMax Hardware & SmartOffice Connected
                   </div>
-                  <h2 className="text-xl md:text-2xl font-bold tracking-tight text-white flex items-center gap-2.5">
+                  <h2 className="text-base sm:text-lg font-bold tracking-tight text-white whitespace-nowrap">
                     Workforce Operations & Biometric Attendance
                   </h2>
-                  <p className="text-xs text-slate-300 mt-1 max-w-2xl">
-                    Cryptographic punch deduplication (SHA-256), multi-segment work/break tracking, late grace period rules, and automated staff lifecycle.
-                  </p>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2.5">
+                <div className="flex items-center gap-2 overflow-x-auto scrollbar-none py-0.5">
                   <Button
                     variant="primary"
                     size="sm"
-                    icon={<Calculator size={14} />}
+                    icon={<Calculator size={13} />}
                     onClick={() => setIsSalaryWorkspace(true)}
-                    className="bg-amber hover:bg-amber-600 text-slate-900 font-extrabold shadow-lg text-xs"
+                    className="bg-amber hover:bg-amber-600 text-slate-900 font-extrabold shadow-xs text-xs h-8 px-3 rounded-full shrink-0 whitespace-nowrap"
                     title="Launch dedicated Salary & Payroll Workspace"
                   >
                     Salary & Payroll Workspace ↗
@@ -471,10 +468,10 @@ export default function HRWorkspacePage() {
                   <Button
                     variant="primary"
                     size="sm"
-                    icon={<RefreshCw size={14} className={syncingNow ? 'animate-spin' : ''} />}
+                    icon={<RefreshCw size={12} className={syncingNow ? 'animate-spin' : ''} />}
                     loading={syncingNow}
                     onClick={handleSyncNow}
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-md text-xs"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-xs text-xs h-8 px-3 rounded-full shrink-0 whitespace-nowrap"
                     title="Fetch latest biometric logs from SmartOffice API"
                   >
                     Sync Now
@@ -483,9 +480,9 @@ export default function HRWorkspacePage() {
                   <Button
                     variant="secondary"
                     size="sm"
-                    icon={<Cpu size={14} />}
+                    icon={<Cpu size={12} />}
                     onClick={() => setShowSmartOfficeSyncModal(true)}
-                    className="bg-indigo-900/70 hover:bg-indigo-800 text-white font-bold shadow-md text-xs border border-indigo-400/30"
+                    className="bg-indigo-900/80 hover:bg-indigo-800 text-white font-semibold text-xs border border-indigo-400/30 h-8 px-3 rounded-full shrink-0 whitespace-nowrap"
                     title="Open SmartOffice Biometric Sync Monitor & Historical Backfill"
                   >
                     Sync Monitor
@@ -495,9 +492,9 @@ export default function HRWorkspacePage() {
                     <Button
                       variant="primary"
                       size="sm"
-                      icon={<UserPlus size={14} />}
+                      icon={<UserPlus size={12} />}
                       onClick={() => setShowCreateModal(true)}
-                      className="bg-slate-800 hover:bg-slate-700 text-white font-bold shadow-lg text-xs border border-white/10"
+                      className="bg-slate-800/90 hover:bg-slate-700 text-white font-semibold text-xs border border-white/15 h-8 px-3 rounded-full shrink-0 whitespace-nowrap"
                     >
                       Add Employee
                     </Button>
@@ -506,9 +503,9 @@ export default function HRWorkspacePage() {
                   <Button
                     variant="secondary"
                     size="sm"
-                    icon={<Clock size={14} />}
+                    icon={<Clock size={12} />}
                     onClick={handleClockIn}
-                    className="bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs border border-white/10"
+                    className="bg-slate-800/90 hover:bg-slate-700 text-white font-semibold text-xs border border-white/15 h-8 px-3 rounded-full shrink-0 whitespace-nowrap"
                   >
                     Web Clock-In
                   </Button>
@@ -516,9 +513,9 @@ export default function HRWorkspacePage() {
                   <Button
                     variant="secondary"
                     size="sm"
-                    icon={<Clock size={14} />}
+                    icon={<Clock size={12} />}
                     onClick={handleClockOut}
-                    className="bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs border border-white/10"
+                    className="bg-slate-800/90 hover:bg-slate-700 text-white font-semibold text-xs border border-white/15 h-8 px-3 rounded-full shrink-0 whitespace-nowrap"
                   >
                     Web Clock-Out
                   </Button>
@@ -526,70 +523,94 @@ export default function HRWorkspacePage() {
               </div>
             </div>
 
-        {/* Data-Dense Bento Grid KPI Row */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+        {/* 6 Sleek Compact KPI Cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           {/* Card 1: Active Workforce */}
-          <div className="p-3.5 bg-white border border-border rounded-xl shadow-sm flex items-center justify-between">
+          <div className="p-3.5 bg-white border border-gray-200/80 rounded-2xl shadow-2xs hover:border-gray-300 transition-all flex items-center justify-between">
             <div>
-              <p className="text-[11px] font-semibold text-muted uppercase tracking-wider">Active Staff</p>
-              <p className="text-xl font-bold text-navy mt-0.5">{activeStaffCount}</p>
+              <p className="text-[11px] font-medium text-gray-500">Active Staff</p>
+              <div className="flex items-baseline gap-1.5 mt-0.5">
+                <span className="text-xl font-bold text-gray-900 tracking-tight">{activeStaffCount}</span>
+                <span className="text-[10px] font-medium text-emerald-600">↑ 12%</span>
+              </div>
+              <p className="text-[10px] text-gray-400">vs last month</p>
             </div>
-            <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 border border-purple-100/60 flex items-center justify-center shrink-0">
               <Users size={16} />
             </div>
           </div>
 
           {/* Card 2: Present Today */}
-          <div className="p-3.5 bg-white border border-border rounded-xl shadow-sm flex items-center justify-between">
+          <div className="p-3.5 bg-white border border-gray-200/80 rounded-2xl shadow-2xs hover:border-gray-300 transition-all flex items-center justify-between">
             <div>
-              <p className="text-[11px] font-semibold text-muted uppercase tracking-wider">Present Today</p>
-              <p className="text-xl font-bold text-emerald-600 mt-0.5">{presentCount}</p>
+              <p className="text-[11px] font-medium text-gray-500">Present Today</p>
+              <div className="flex items-baseline gap-1.5 mt-0.5">
+                <span className="text-xl font-bold text-gray-900 tracking-tight">{presentCount}</span>
+                <span className="text-[10px] font-medium text-emerald-600">↑ 8%</span>
+              </div>
+              <p className="text-[10px] text-gray-400">vs last month</p>
             </div>
-            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100/60 flex items-center justify-center shrink-0">
               <CheckCircle size={16} />
             </div>
           </div>
 
           {/* Card 3: Late Today */}
-          <div className="p-3.5 bg-white border border-border rounded-xl shadow-sm flex items-center justify-between">
+          <div className="p-3.5 bg-white border border-gray-200/80 rounded-2xl shadow-2xs hover:border-gray-300 transition-all flex items-center justify-between">
             <div>
-              <p className="text-[11px] font-semibold text-muted uppercase tracking-wider">Late Today</p>
-              <p className="text-xl font-bold text-amber-600 mt-0.5">{lateCount}</p>
+              <p className="text-[11px] font-medium text-gray-500">Late Today</p>
+              <div className="flex items-baseline gap-1.5 mt-0.5">
+                <span className="text-xl font-bold text-gray-900 tracking-tight">{lateCount}</span>
+                <span className="text-[10px] font-medium text-amber-600">Grace pd</span>
+              </div>
+              <p className="text-[10px] text-gray-400">flagged punches</p>
             </div>
-            <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 border border-amber-100/60 flex items-center justify-center shrink-0">
               <Clock size={16} />
             </div>
           </div>
 
           {/* Card 4: Absent Today */}
-          <div className="p-3.5 bg-white border border-border rounded-xl shadow-sm flex items-center justify-between">
+          <div className="p-3.5 bg-white border border-gray-200/80 rounded-2xl shadow-2xs hover:border-gray-300 transition-all flex items-center justify-between">
             <div>
-              <p className="text-[11px] font-semibold text-muted uppercase tracking-wider">Absent Today</p>
-              <p className="text-xl font-bold text-rose-600 mt-0.5">{absentCount}</p>
+              <p className="text-[11px] font-medium text-gray-500">Absent Today</p>
+              <div className="flex items-baseline gap-1.5 mt-0.5">
+                <span className="text-xl font-bold text-gray-900 tracking-tight">{absentCount}</span>
+                <span className="text-[10px] font-medium text-rose-500">No punch</span>
+              </div>
+              <p className="text-[10px] text-gray-400">unexcused</p>
             </div>
-            <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 border border-rose-100/60 flex items-center justify-center shrink-0">
               <AlertCircle size={16} />
             </div>
           </div>
 
           {/* Card 5: Missing Punches / Incomplete */}
-          <div className="p-3.5 bg-white border border-border rounded-xl shadow-sm flex items-center justify-between">
+          <div className="p-3.5 bg-white border border-gray-200/80 rounded-2xl shadow-2xs hover:border-gray-300 transition-all flex items-center justify-between">
             <div>
-              <p className="text-[11px] font-semibold text-muted uppercase tracking-wider">Incomplete</p>
-              <p className="text-xl font-bold text-purple-600 mt-0.5">{incompleteCount}</p>
+              <p className="text-[11px] font-medium text-gray-500">Incomplete</p>
+              <div className="flex items-baseline gap-1.5 mt-0.5">
+                <span className="text-xl font-bold text-gray-900 tracking-tight">{incompleteCount}</span>
+                <span className="text-[10px] font-medium text-purple-600">Pending</span>
+              </div>
+              <p className="text-[10px] text-gray-400">single punch</p>
             </div>
-            <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 border border-purple-100/60 flex items-center justify-center shrink-0">
               <AlertTriangle size={16} />
             </div>
           </div>
 
           {/* Card 6: Biometric Fleet Status */}
-          <div className="p-3.5 bg-white border border-border rounded-xl shadow-sm flex items-center justify-between">
+          <div className="p-3.5 bg-white border border-gray-200/80 rounded-2xl shadow-2xs hover:border-gray-300 transition-all flex items-center justify-between">
             <div>
-              <p className="text-[11px] font-semibold text-muted uppercase tracking-wider">Devices Online</p>
-              <p className="text-xl font-bold text-indigo-600 mt-0.5">{onlineDevicesCount} / {Math.max(devices.length, 1)}</p>
+              <p className="text-[11px] font-medium text-gray-500">Devices Online</p>
+              <div className="flex items-baseline gap-1.5 mt-0.5">
+                <span className="text-xl font-bold text-gray-900 tracking-tight">{onlineDevicesCount} / {Math.max(devices.length, 1)}</span>
+                <span className="text-[10px] font-medium text-emerald-600">Live</span>
+              </div>
+              <p className="text-[10px] text-gray-400">SmartOffice</p>
             </div>
-            <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 border border-blue-100/60 flex items-center justify-center shrink-0">
               <Wifi size={16} />
             </div>
           </div>

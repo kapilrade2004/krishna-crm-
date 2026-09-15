@@ -441,25 +441,25 @@ export default function HRWorkspacePage() {
         {!isSalaryWorkspace ? (
           <>
             {/* Command Bar Header */}
-            <div className="relative rounded-xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 px-4 py-2.5 text-white shadow-md">
-              <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-2.5 relative z-10">
+            <div className="relative rounded-xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 px-5 py-3.5 text-white shadow-md">
+              <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3 relative z-10">
                 <div className="shrink-0">
-                  <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/10 text-[9.5px] font-medium text-amber border border-white/15 mb-0.5">
-                    <Cpu size={10} />
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/10 text-[11px] font-semibold text-amber border border-white/20 mb-1">
+                    <Cpu size={12} />
                     BioMax Hardware & SmartOffice Connected
                   </div>
-                  <h2 className="text-sm sm:text-base font-bold tracking-tight text-white">
+                  <h2 className="text-lg sm:text-xl font-bold tracking-tight text-white leading-tight">
                     Workforce Operations & Biometric Attendance
                   </h2>
                 </div>
 
-                <div className="flex flex-wrap items-center xl:justify-end gap-1.5">
+                <div className="flex items-center gap-1.5 shrink-0 overflow-x-auto scrollbar-none py-0.5 max-w-full">
                   <Button
                     variant="primary"
                     size="sm"
                     icon={<Calculator size={12} />}
                     onClick={() => setIsSalaryWorkspace(true)}
-                    className="bg-amber hover:bg-amber-600 text-slate-900 font-extrabold shadow-2xs text-[11px] h-7 px-2.5 rounded-full"
+                    className="bg-amber hover:bg-amber-600 text-slate-900 font-extrabold shadow-2xs text-[11px] h-7 px-2.5 rounded-full shrink-0 whitespace-nowrap"
                     title="Launch dedicated Salary & Payroll Workspace"
                   >
                     Salary & Payroll Workspace ↗
@@ -471,7 +471,7 @@ export default function HRWorkspacePage() {
                     icon={<RefreshCw size={11} className={syncingNow ? 'animate-spin' : ''} />}
                     loading={syncingNow}
                     onClick={handleSyncNow}
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-2xs text-[11px] h-7 px-2.5 rounded-full"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-2xs text-[11px] h-7 px-2.5 rounded-full shrink-0 whitespace-nowrap"
                     title="Fetch latest biometric logs from SmartOffice API"
                   >
                     Sync Now
@@ -482,7 +482,7 @@ export default function HRWorkspacePage() {
                     size="sm"
                     icon={<Cpu size={11} />}
                     onClick={() => setShowSmartOfficeSyncModal(true)}
-                    className="bg-indigo-900/80 hover:bg-indigo-800 text-white font-semibold text-[11px] border border-indigo-400/30 h-7 px-2.5 rounded-full"
+                    className="bg-indigo-900/80 hover:bg-indigo-800 text-white font-semibold text-[11px] border border-indigo-400/30 h-7 px-2.5 rounded-full shrink-0 whitespace-nowrap"
                     title="Open SmartOffice Biometric Sync Monitor & Historical Backfill"
                   >
                     Sync Monitor
@@ -494,7 +494,7 @@ export default function HRWorkspacePage() {
                       size="sm"
                       icon={<UserPlus size={11} />}
                       onClick={() => setShowCreateModal(true)}
-                      className="bg-slate-800/90 hover:bg-slate-700 text-white font-semibold text-[11px] border border-white/15 h-7 px-2.5 rounded-full"
+                      className="bg-slate-800/90 hover:bg-slate-700 text-white font-semibold text-[11px] border border-white/15 h-7 px-2.5 rounded-full shrink-0 whitespace-nowrap"
                     >
                       Add Employee
                     </Button>
@@ -505,7 +505,7 @@ export default function HRWorkspacePage() {
                     size="sm"
                     icon={<Clock size={11} />}
                     onClick={handleClockIn}
-                    className="bg-slate-800/90 hover:bg-slate-700 text-white font-semibold text-[11px] border border-white/15 h-7 px-2.5 rounded-full"
+                    className="bg-slate-800/90 hover:bg-slate-700 text-white font-semibold text-[11px] border border-white/15 h-7 px-2.5 rounded-full shrink-0 whitespace-nowrap"
                   >
                     Web Clock-In
                   </Button>
@@ -515,7 +515,7 @@ export default function HRWorkspacePage() {
                     size="sm"
                     icon={<Clock size={11} />}
                     onClick={handleClockOut}
-                    className="bg-slate-800/90 hover:bg-slate-700 text-white font-semibold text-[11px] border border-white/15 h-7 px-2.5 rounded-full"
+                    className="bg-slate-800/90 hover:bg-slate-700 text-white font-semibold text-[11px] border border-white/15 h-7 px-2.5 rounded-full shrink-0 whitespace-nowrap"
                   >
                     Web Clock-Out
                   </Button>

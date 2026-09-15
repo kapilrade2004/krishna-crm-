@@ -1,0 +1,389 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-pebble: #EEEEEE;
+  --color-yam: #EA9216;
+  --color-cadet: #3A4750;
+  --color-hightide: #313841;
+}
+
+@layer base {
+  * { box-sizing: border-box; }
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 106.25%;
+  }
+  body { background: #EEEEEE; color: #313841; }
+}
+
+@layer components {
+  /* Sidebar */
+  .sidebar-item {
+    @apply flex items-center gap-2.5 px-3 py-2 mx-2 rounded-md text-white/60 text-sm cursor-pointer transition-all duration-150 hover:bg-white/[0.07] hover:text-white/90;
+  }
+  .sidebar-item.active {
+    @apply bg-amber text-navy font-medium;
+  }
+
+  /* Cards */
+  .card {
+    @apply bg-white rounded-xl border border-border shadow-card p-4 transition-all duration-200 ease-out hover:border-amber/40 hover:shadow-md;
+  }
+  .card-header {
+    @apply flex items-center justify-between mb-4;
+  }
+  .card-title {
+    @apply text-sm font-medium text-navy;
+  }
+
+  /* Buttons */
+  .btn {
+    @apply inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all duration-200 ease-out cursor-pointer border-0 select-none active:scale-[0.97] hover:-translate-y-0.5;
+  }
+  .btn-primary {
+    @apply btn bg-amber text-navy hover:bg-amber-600 shadow-sm hover:shadow-md hover:shadow-amber-500/25;
+  }
+  .btn-secondary {
+    @apply btn bg-white text-navy border border-border hover:bg-slate-50 hover:border-amber/50 hover:shadow-sm;
+  }
+  .btn-danger {
+    @apply btn bg-danger text-white hover:bg-red-600 shadow-sm hover:shadow-md hover:shadow-red-500/25;
+  }
+  .btn-ghost {
+    @apply btn bg-transparent text-muted hover:bg-surface hover:text-navy hover:translate-y-0;
+  }
+
+  /* Status badges */
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold;
+  }
+  .badge-pending   { @apply badge bg-yellow-100 text-yellow-700; }
+  .badge-confirmed { @apply badge bg-blue-100 text-blue-700; }
+  .badge-processing { @apply badge bg-purple-100 text-purple-700; }
+  .badge-dispatched { @apply badge bg-amber-100 text-amber-700; }
+  .badge-delivered  { @apply badge bg-teal-50 text-teal-600; }
+  .badge-cancelled  { @apply badge bg-red-100 text-red-600; }
+  .badge-returned   { @apply badge bg-gray-100 text-gray-600; }
+  .badge-active     { @apply badge bg-teal-50 text-teal-600; }
+  .badge-inactive   { @apply badge bg-gray-100 text-gray-500; }
+  .badge-high       { @apply badge bg-red-100 text-red-700; }
+  .badge-medium     { @apply badge bg-yellow-100 text-yellow-700; }
+  .badge-low        { @apply badge bg-blue-100 text-blue-700; }
+  .badge-urgent     { @apply badge bg-red-200 text-red-800; }
+
+  /* Form inputs */
+  .form-input {
+    @apply w-full px-3 py-2 text-sm border border-border rounded-md bg-white text-navy placeholder:text-muted
+           focus:outline-none focus:ring-2 focus:ring-amber/30 focus:border-amber transition-colors;
+  }
+  .form-label {
+    @apply block text-xs font-medium text-muted mb-1.5;
+  }
+  .form-group {
+    @apply flex flex-col gap-0;
+  }
+
+  /* Tables */
+  .data-table {
+    @apply w-full border-collapse text-left;
+  }
+  .data-table th {
+    @apply text-xs font-semibold text-muted text-left px-3 py-2.5 border-b border-border bg-surface uppercase tracking-wide whitespace-nowrap;
+  }
+  .data-table td {
+    @apply text-sm text-navy px-3 py-3 border-b border-border/70 whitespace-nowrap;
+  }
+  .data-table tr:last-child td {
+    @apply border-b-0;
+  }
+  .data-table tr:hover td {
+    @apply bg-surface/60;
+  }
+
+  /* Table Column Dimensions */
+  .sticky-col-checkbox,
+  .sticky-col-header-checkbox {
+    @apply w-12 min-w-[48px] max-w-[48px] text-center;
+  }
+  .sticky-col-order,
+  .sticky-col-header-order {
+    @apply min-w-[240px];
+  }
+
+  /* KPI Cards */
+  .kpi-card {
+    @apply card flex flex-col gap-1;
+  }
+  .kpi-value {
+    @apply text-2xl font-semibold text-navy leading-none;
+  }
+  .kpi-label {
+    @apply text-xs font-medium text-muted flex items-center gap-1.5;
+  }
+  .kpi-trend-up   { @apply text-teal text-xs font-medium; }
+  .kpi-trend-down { @apply text-danger text-xs font-medium; }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+
+/* ── Modern Select Dropdown Styling System ────────────────────────────────── */
+select, .form-select {
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748B' stroke-width='2.2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7' /%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 0.85rem center !important;
+  background-size: 0.95rem 0.95rem !important;
+  min-height: 38px !important;
+  padding: 0.45rem 2.5rem 0.45rem 0.85rem !important;
+  cursor: pointer !important;
+  border-radius: 0.75rem !important;
+  border: 1px solid #E2E8F0 !important;
+  background-color: #FFFFFF !important;
+  color: #0F1C2E !important;
+  font-weight: 500 !important;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  box-shadow: 0 1px 2px 0 rgba(15, 28, 46, 0.04) !important;
+}
+
+select:hover, .form-select:hover {
+  border-color: rgba(245, 158, 11, 0.8) !important;
+  background-color: #F8FAFC !important;
+  box-shadow: 0 3px 8px 0 rgba(245, 158, 11, 0.12) !important;
+  transform: translateY(-0.5px) !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23D97706' stroke-width='2.4'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7' /%3E%3C/svg%3E") !important;
+}
+
+select:focus, .form-select:focus {
+  outline: none !important;
+  border-color: #F59E0B !important;
+  box-shadow: 0 0 0 3.5px rgba(245, 158, 11, 0.22), 0 2px 8px 0 rgba(245, 158, 11, 0.12) !important;
+  background-color: #FFFFFF !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23D97706' stroke-width='2.4'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7' /%3E%3C/svg%3E") !important;
+}
+
+/* Disable duplicate CSS background arrow when appearance-none or custom wrapper arrow is used */
+select.appearance-none,
+select[class*="appearance-none"],
+select.no-arrow,
+.no-arrow select {
+  background-image: none !important;
+}
+
+select.appearance-none:hover,
+select[class*="appearance-none"]:hover,
+select.no-arrow:hover,
+.no-arrow select:hover {
+  background-image: none !important;
+}
+
+select.appearance-none:focus,
+select[class*="appearance-none"]:focus,
+select.no-arrow:focus,
+.no-arrow select:focus {
+  background-image: none !important;
+}
+
+select:disabled, .form-select:disabled {
+  opacity: 0.55 !important;
+  cursor: not-allowed !important;
+  background-color: #F1F5F9 !important;
+  border-color: #E2E8F0 !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+select option {
+  padding: 0.75rem 1rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: #0F1C2E;
+  background-color: #FFFFFF;
+}
+
+select optgroup {
+  font-weight: 700;
+  color: #64748B;
+  background-color: #F8FAFC;
+  padding: 0.5rem 0.75rem;
+}
+
+/* ── Modern Date / Time & Calendar Input Styling System ───────────────────── */
+input[type="date"],
+input[type="datetime-local"],
+input[type="month"],
+input[type="time"] {
+  border-radius: 0.75rem !important;
+  border: 1px solid #E2E8F0 !important;
+  background-color: #FFFFFF !important;
+  color: #0F1C2E !important;
+  font-weight: 500 !important;
+  font-size: 0.875rem !important;
+  padding: 0.55rem 0.85rem !important;
+  cursor: pointer !important;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  box-shadow: 0 1px 2px 0 rgba(15, 28, 46, 0.04) !important;
+  font-variant-numeric: tabular-nums !important;
+}
+
+input[type="date"]:hover,
+input[type="datetime-local"]:hover,
+input[type="month"]:hover,
+input[type="time"]:hover {
+  border-color: rgba(245, 158, 11, 0.8) !important;
+  background-color: #F8FAFC !important;
+  box-shadow: 0 3px 8px 0 rgba(245, 158, 11, 0.12) !important;
+  transform: translateY(-0.5px) !important;
+}
+
+input[type="date"]:focus,
+input[type="datetime-local"]:focus,
+input[type="month"]:focus,
+input[type="time"]:focus {
+  outline: none !important;
+  border-color: #F59E0B !important;
+  box-shadow: 0 0 0 3.5px rgba(245, 158, 11, 0.22), 0 2px 8px 0 rgba(245, 158, 11, 0.12) !important;
+  background-color: #FFFFFF !important;
+}
+
+input[type="date"]:disabled,
+input[type="datetime-local"]:disabled,
+input[type="month"]:disabled,
+input[type="time"]:disabled {
+  opacity: 0.55 !important;
+  cursor: not-allowed !important;
+  background-color: #F1F5F9 !important;
+  border-color: #E2E8F0 !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* Custom Styled Calendar Icon in Webkit Browsers (Chrome, Edge, Safari) */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+input[type="month"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  cursor: pointer !important;
+  border-radius: 0.5rem !important;
+  padding: 0.25rem !important;
+  margin-right: -0.25rem !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  filter: invert(45%) sepia(85%) saturate(1200%) hue-rotate(15deg) brightness(95%) contrast(98%) !important;
+  opacity: 0.8 !important;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover,
+input[type="month"]::-webkit-calendar-picker-indicator:hover,
+input[type="time"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1 !important;
+  transform: scale(1.18) !important;
+  background-color: rgba(245, 158, 11, 0.15) !important;
+  filter: invert(35%) sepia(95%) saturate(1500%) hue-rotate(15deg) brightness(90%) contrast(100%) !important;
+}
+
+input[type="date"]::-webkit-datetime-edit-text {
+  color: #94A3B8 !important;
+  padding: 0 0.15rem !important;
+}
+
+input[type="date"]::-webkit-datetime-edit-month-field:focus,
+input[type="date"]::-webkit-datetime-edit-day-field:focus,
+input[type="date"]::-webkit-datetime-edit-year-field:focus {
+  background-color: rgba(245, 158, 11, 0.2) !important;
+  color: #0F1C2E !important;
+  border-radius: 0.25rem !important;
+}
+
+/* ── Custom Micro-Animations for Dropdowns, Modals & Popovers ─────────────── */
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes dropdownFadeInTop {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes fadeInFast {
+  from {
+    opacity: 0;
+    transform: scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in-fast {
+  animation: fadeInFast 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(245, 158, 11, 0);
+  }
+}
+
+.animate-dropdown {
+  animation: dropdownFadeIn 0.16s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-dropdown-top {
+  animation: dropdownFadeInTop 0.16s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.pulse-amber {
+  animation: pulseGlow 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+/* Custom subtle scrollbar */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #CBD5E1 transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 9999px;
+  transition: background-color 0.2s;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}

@@ -1,0 +1,14 @@
+node_modules/
+.next/
+dist/
+build/
+out/
+coverage/
+*.log
+uploads/
+logs/
+.DS_Store
+.env
+.env*.local
+*.sqlite*
+tsconfig.tsbuildinfo
